@@ -10,7 +10,8 @@ import {
   DocumentDuplicateIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
-  ClockIcon
+  ClockIcon,
+  ClipboardDocumentIcon
 } from '@heroicons/vue/24/outline'
 
 interface Props {
@@ -112,6 +113,12 @@ const duplicateBlock = () => {
 // 选择代码块
 const selectBlock = () => {
   emit('select', props.block.id)
+}
+
+// 复制输出内容
+const copyOutput = (output: any) => {
+  const text = renderOutput(output)
+  navigator.clipboard.writeText(text)
 }
 
 // 渲染输出内容
@@ -290,11 +297,20 @@ watch(() => props.block.content, (newContent) => {
             <span class="text-xs text-gray-500">
               {{ output.type }} {{ output.level ? `(${output.level})` : '' }}
             </span>
-            <span class="text-xs text-gray-400">
-              {{ new Date(output.timestamp).toLocaleTimeString() }}
-            </span>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs text-gray-400">
+                {{ new Date(output.timestamp).toLocaleTimeString() }}
+              </span>
+              <button
+                @click.stop="copyOutput(output)"
+                class="p-1 rounded text-gray-600 hover:bg-gray-100 transition-colors"
+                title="复制输出内容"
+              >
+                <ClipboardDocumentIcon class="w-3 h-3" />
+              </button>
+            </div>
           </div>
-          <div class="whitespace-pre-wrap">{{ renderOutput(output) }}</div>
+          <div class="whitespace-pre-wrap select-text cursor-text">{{ renderOutput(output) }}</div>
         </div>
       </div>
     </div>
@@ -302,7 +318,7 @@ watch(() => props.block.content, (newContent) => {
     <!-- 错误信息 -->
     <div v-if="hasError && props.block.error" class="block-error bg-red-50 border-t border-red-200 p-4">
       <h4 class="text-sm font-medium text-red-700 mb-2">执行错误:</h4>
-      <div class="text-sm text-red-600 font-mono">{{ props.block.error }}</div>
+      <div class="text-sm text-red-600 font-mono select-text cursor-text bg-red-100 p-2 rounded border border-red-200">{{ props.block.error }}</div>
     </div>
   </div>
 </template>

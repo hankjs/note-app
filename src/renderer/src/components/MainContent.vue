@@ -81,7 +81,7 @@ const duplicateBlock = (blockId: string) => {
         <div class="border-l border-gray-300 mx-2 h-6"></div>
         
         <button
-          @click="executeAllBlocks"
+          @click="() => executeAllBlocks()"
           class="flex items-center space-x-1 px-3 py-1.5 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 transition-colors"
           title="运行所有代码块"
         >
