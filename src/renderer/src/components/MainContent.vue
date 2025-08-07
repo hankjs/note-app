@@ -1,58 +1,54 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { useFilesStore } from '@/stores/files'
-import { useEditorStore } from '@/stores/editor'
-import { markdownToHtml } from '@/utils/markdown'
+import { ref } from 'vue'
+import { useCodeBlocksStore } from '@/stores/codeBlocks'
+import { useCodeExecution } from '@/composables/useCodeExecution'
+import CodeBlock from './CodeBlock.vue'
 import { 
-  EyeIcon, 
-  EyeSlashIcon,
-  ArrowsPointingOutIcon,
-  ArrowsPointingInIcon
+  PlayIcon,
+  StopIcon,
+  TrashIcon,
+  DocumentTextIcon,
+  CodeBracketIcon
 } from '@heroicons/vue/24/outline'
 
-const filesStore = useFilesStore()
-const editorStore = useEditorStore()
+const blocksStore = useCodeBlocksStore()
+const { executeAllBlocks, stopExecution, clearAllOutputs, executionStats } = useCodeExecution()
 
-const editorContent = ref('')
-const previewContent = ref('')
+const selectedBlockId = ref<string | null>(null)
 
-// 监听当前文件变化
-watch(() => filesStore.currentFile, (newFile) => {
-  if (newFile) {
-    editorContent.value = newFile.content || ''
-    updatePreview()
-  } else {
-    editorContent.value = ''
-    previewContent.value = ''
+// 创建新的 JavaScript 代码块
+const createJavaScriptBlock = () => {
+  const block = blocksStore.createJavaScriptBlock('// 在这里编写 JavaScript 代码\nconsole.log("Hello, World!");')
+  selectedBlockId.value = block.id
+}
+
+// 创建新的 Markdown 代码块
+const createMarkdownBlock = () => {
+  const block = blocksStore.createMarkdownBlock('# 新的 Markdown 块\n\n在这里编写 Markdown 内容...')
+  selectedBlockId.value = block.id
+}
+
+
+
+// 选择代码块
+const selectBlock = (blockId: string) => {
+  selectedBlockId.value = blockId
+  blocksStore.selectBlock(blockId)
+}
+
+// 删除代码块
+const deleteBlock = (blockId: string) => {
+  blocksStore.deleteBlock(blockId)
+  if (selectedBlockId.value === blockId) {
+    selectedBlockId.value = null
   }
-}, { immediate: true })
-
-// 监听编辑器内容变化
-watch(editorContent, () => {
-  updatePreview()
-  if (filesStore.currentFile) {
-    filesStore.updateFileContent(filesStore.currentFile.id, editorContent.value)
-    editorStore.setDirty(true)
-  }
-})
-
-const updatePreview = () => {
-  previewContent.value = markdownToHtml(editorContent.value)
 }
 
-const togglePreviewMode = () => {
-  editorStore.togglePreviewMode()
-}
-
-const toggleFullscreen = () => {
-  editorStore.toggleFullscreen()
-}
-
-const saveFile = async () => {
-  if (filesStore.currentFile) {
-    // TODO: 实现文件保存到磁盘
-    console.log('保存文件:', filesStore.currentFile.name)
-    editorStore.setDirty(false)
+// 复制代码块
+const duplicateBlock = (blockId: string) => {
+  const newBlock = blocksStore.duplicateBlock(blockId)
+  if (newBlock) {
+    selectedBlockId.value = newBlock.id
   }
 }
 </script>
@@ -62,102 +58,121 @@ const saveFile = async () => {
     <!-- 工具栏 -->
     <div class="toolbar bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between">
       <div class="flex items-center space-x-2">
+        <!-- 新建代码块按钮 -->
         <button
-          @click="togglePreviewMode"
-          class="p-2 rounded hover:bg-gray-100 transition-colors"
-          :title="editorStore.isPreviewMode ? '关闭预览' : '开启预览'"
+          @click="createJavaScriptBlock"
+          class="flex items-center space-x-1 px-3 py-1.5 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
+          title="新建 JavaScript 代码块"
         >
-          <EyeIcon v-if="!editorStore.isPreviewMode" class="w-4 h-4 text-gray-600" />
-          <EyeSlashIcon v-else class="w-4 h-4 text-gray-600" />
+          <CodeBracketIcon class="w-4 h-4" />
+          <span>JS</span>
         </button>
         
         <button
-          @click="toggleFullscreen"
-          class="p-2 rounded hover:bg-gray-100 transition-colors"
-          :title="editorStore.isFullscreen ? '退出全屏' : '全屏模式'"
+          @click="createMarkdownBlock"
+          class="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+          title="新建 Markdown 块"
         >
-          <ArrowsPointingOutIcon v-if="!editorStore.isFullscreen" class="w-4 h-4 text-gray-600" />
-          <ArrowsPointingInIcon v-else class="w-4 h-4 text-gray-600" />
+          <DocumentTextIcon class="w-4 h-4" />
+          <span>MD</span>
+        </button>
+
+        <!-- 执行控制按钮 -->
+        <div class="border-l border-gray-300 mx-2 h-6"></div>
+        
+        <button
+          @click="executeAllBlocks"
+          class="flex items-center space-x-1 px-3 py-1.5 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 transition-colors"
+          title="运行所有代码块"
+        >
+          <PlayIcon class="w-4 h-4" />
+          <span>运行全部</span>
+        </button>
+        
+        <button
+          @click="stopExecution"
+          class="flex items-center space-x-1 px-3 py-1.5 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors"
+          title="停止执行"
+        >
+          <StopIcon class="w-4 h-4" />
+          <span>停止</span>
+        </button>
+        
+        <button
+          @click="clearAllOutputs"
+          class="flex items-center space-x-1 px-3 py-1.5 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition-colors"
+          title="清除所有输出"
+        >
+          <TrashIcon class="w-4 h-4" />
+          <span>清除输出</span>
         </button>
       </div>
 
       <div class="flex items-center space-x-2">
-        <div v-if="editorStore.isDirty" class="text-xs text-orange-600">
-          未保存
+        <!-- 执行统计 -->
+        <div class="text-xs text-gray-600">
+          {{ executionStats.jsBlocks }} JS块 | 
+          {{ executionStats.executedBlocks }} 已执行 | 
+          {{ executionStats.errorBlocks }} 错误
         </div>
-        <button
-          @click="saveFile"
-          class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
-        >
-          保存
-        </button>
       </div>
     </div>
 
     <!-- 主内容区域 -->
-    <div class="content-area flex-1 flex">
-      <!-- 编辑器区域 -->
-      <div 
-        :class="[
-          'editor-area flex-1',
-          editorStore.isPreviewMode ? 'hidden' : 'block'
-        ]"
-      >
-        <div v-if="!filesStore.currentFile" class="flex items-center justify-center h-full text-gray-500">
-          <div class="text-center">
-            <div class="text-6xl mb-4">📝</div>
-            <h3 class="text-lg font-medium mb-2">欢迎使用 Markdown 编辑器</h3>
-            <p class="text-sm">从侧边栏选择一个文件开始编辑，或创建新文件</p>
+    <div class="content-area flex-1 overflow-y-auto p-4">
+      <!-- 空状态 -->
+      <div v-if="blocksStore.blocks.length === 0" class="flex items-center justify-center h-full text-gray-500">
+        <div class="text-center">
+          <div class="text-6xl mb-4">🚀</div>
+          <h3 class="text-lg font-medium mb-2">欢迎使用 Jupyter-like JavaScript 笔记</h3>
+          <p class="text-sm mb-4">创建你的第一个代码块开始编程</p>
+          <div class="flex space-x-2 justify-center">
+            <button
+              @click="createJavaScriptBlock"
+              class="flex items-center space-x-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+            >
+              <CodeBracketIcon class="w-4 h-4" />
+              <span>JavaScript 代码块</span>
+            </button>
+            <button
+              @click="createMarkdownBlock"
+              class="flex items-center space-x-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            >
+              <DocumentTextIcon class="w-4 h-4" />
+              <span>Markdown 块</span>
+            </button>
           </div>
-        </div>
-        
-        <div v-else class="h-full">
-          <textarea
-            v-model="editorContent"
-            class="w-full h-full p-4 resize-none border-none outline-none font-mono text-sm leading-relaxed"
-            placeholder="开始编写你的 Markdown 内容..."
-            :style="{
-              fontSize: `${editorStore.settings.fontSize}px`,
-              lineHeight: editorStore.settings.lineHeight
-            }"
-          ></textarea>
         </div>
       </div>
 
-      <!-- 预览区域 -->
-      <div 
-        v-if="editorStore.isPreviewMode"
-        class="preview-area flex-1 border-l border-gray-200 overflow-y-auto"
-      >
-        <div class="p-4">
-          <div 
-            v-if="previewContent"
-            class="prose prose-sm max-w-none"
-            v-html="previewContent"
-          ></div>
-          <div v-else class="text-gray-500 text-center py-8">
-            预览区域
-          </div>
-        </div>
+      <!-- 代码块列表 -->
+      <div v-else class="space-y-4">
+        <CodeBlock
+          v-for="block in blocksStore.blocks"
+          :key="block.id"
+          :block="block"
+          :is-selected="selectedBlockId === block.id"
+          @select="selectBlock"
+          @delete="deleteBlock"
+          @duplicate="duplicateBlock"
+        />
       </div>
     </div>
 
     <!-- 状态栏 -->
     <div class="status-bar bg-gray-50 border-t border-gray-200 px-4 py-1 flex items-center justify-between text-xs text-gray-600">
       <div class="flex items-center space-x-4">
-        <span v-if="filesStore.currentFile">
-          {{ filesStore.currentFile.name }}
+        <span>总代码块: {{ executionStats.totalBlocks }}</span>
+        <span v-if="executionStats.totalExecutionTime > 0">
+          总执行时间: {{ executionStats.totalExecutionTime }}ms
         </span>
-        <span v-else>无文件</span>
       </div>
       
       <div class="flex items-center space-x-4">
-        <span v-if="editorContent">
-          {{ editorContent.length }} 字符
+        <span v-if="selectedBlockId">
+          选中: {{ blocksStore.getBlock(selectedBlockId)?.type || 'unknown' }}
         </span>
-        <span v-if="editorStore.isPreviewMode">
-          预览模式
-        </span>
+        <span v-else>未选择代码块</span>
       </div>
     </div>
   </div>
