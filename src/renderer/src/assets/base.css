@@ -11,9 +11,10 @@
   --ev-c-gray-2: #414853;
   --ev-c-gray-3: #32363f;
 
-  --ev-c-text-1: rgba(255, 255, 245, 0.86);
-  --ev-c-text-2: rgba(235, 235, 245, 0.6);
-  --ev-c-text-3: rgba(235, 235, 245, 0.38);
+  /* text */
+  --ev-c-text-1: rgba(0, 0, 0, 0.86);
+  --ev-c-text-2: rgba(0, 0, 0, 0.6);
+  --ev-c-text-3: rgba(0, 0, 0, 0.38);
 
   --ev-button-alt-border: transparent;
   --ev-button-alt-text: var(--ev-c-text-1);

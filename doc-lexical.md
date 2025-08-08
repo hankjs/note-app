@@ -6,29 +6,29 @@
 ## 阶段一：环境准备和依赖安装
 
 ### 1.1 安装 Lexical 核心依赖
-- [ ] 安装 `lexical` 核心包
-- [ ] 安装 `@lexical/rich-text` 富文本插件
-- [ ] 安装 `@lexical/list` 列表插件
-- [ ] 安装 `@lexical/link` 链接插件
-- [ ] 安装 `@lexical/table` 表格插件
-- [ ] 安装 `@lexical/code` 代码块插件
-- [ ] 安装 `@lexical/selection` 选择插件
-- [ ] 安装 `@lexical/history` 历史记录插件
-- [ ] 安装 `@lexical/clipboard` 剪贴板插件
-- [ ] 安装 `@lexical/file` 文件处理插件
-- [ ] 安装 `@lexical/html` HTML 转换插件
-- [ ] 安装 `@lexical/markdown` Markdown 转换插件
-- [ ] 安装 `@lexical/theme` 主题包
-- [ ] 安装 `@lexical/utils` 工具包
+- [x] 安装 `lexical` 核心包
+- [x] 安装 `@lexical/rich-text` 富文本插件
+- [x] 安装 `@lexical/list` 列表插件
+- [x] 安装 `@lexical/link` 链接插件
+- [x] 安装 `@lexical/table` 表格插件
+- [x] 安装 `@lexical/code` 代码块插件
+- [x] 安装 `@lexical/selection` 选择插件
+- [x] 安装 `@lexical/history` 历史记录插件
+- [x] 安装 `@lexical/clipboard` 剪贴板插件
+- [x] 安装 `@lexical/file` 文件处理插件
+- [x] 安装 `@lexical/html` HTML 转换插件
+- [x] 安装 `@lexical/markdown` Markdown 转换插件
+- [x] 安装 `@lexical/utils` 工具包
+- [ ] 安装主题相关依赖（需要研究 Lexical 主题实现方式）
 
 ### 1.2 自定义 Vue 集成实现
-- [ ] 研究 Lexical 核心 API 和生命周期
-- [ ] 设计 Vue 3 Composition API 集成方案
-- [ ] 实现 Vue 组件与 Lexical 编辑器的桥接
-- [ ] 创建自定义的 Vue-Lexical 适配层
-- [ ] 实现响应式数据绑定
-- [ ] 处理编辑器状态同步
-- [ ] 实现事件系统集成
+- [x] 研究 Lexical 核心 API 和生命周期
+- [x] 设计 Vue 3 Composition API 集成方案
+- [x] 实现 Vue 组件与 Lexical 编辑器的桥接
+- [x] 创建自定义的 Vue-Lexical 适配层
+- [x] 实现响应式数据绑定
+- [x] 处理编辑器状态同步
+- [x] 实现事件系统集成
 
 ### 1.3 移除不需要的依赖
 - [ ] 移除 `@codemirror/lang-markdown`
@@ -47,16 +47,17 @@
 - [ ] 更新 store 中的相关方法
 
 ### 2.2 创建自定义 Vue-Lexical 集成
-- [ ] 创建 `useLexicalEditor` composable
-- [ ] 实现 Lexical 编辑器实例管理
-- [ ] 创建 `LexicalEditor.vue` 组件
-- [ ] 实现 Vue 组件与 Lexical 的双向绑定
-- [ ] 配置主题和样式
+- [x] 创建 `useLexicalEditor` composable
+- [x] 实现 Lexical 编辑器实例管理
+- [x] 创建 `LexicalEditor.vue` 组件
+- [x] 实现 Vue 组件与 Lexical 的双向绑定
+- [x] 配置主题和样式
+- [x] 修复编辑器无法输入的问题
 - [ ] 实现工具栏功能
 - [ ] 添加快捷键支持
-- [ ] 实现编辑器配置管理
-- [ ] 处理编辑器生命周期
-- [ ] 实现插件系统集成
+- [x] 实现编辑器配置管理
+- [x] 处理编辑器生命周期
+- [x] 实现插件系统集成（基础版本）
 
 ### 2.3 重构主内容组件
 - [ ] 修改 `MainContent.vue` 组件

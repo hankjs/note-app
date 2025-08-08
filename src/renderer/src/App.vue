@@ -1,22 +1,11 @@
 <script setup lang="ts">
-import Sidebar from './components/Sidebar.vue'
-import MainContent from './components/MainContent.vue'
-import Toolbar from './components/Toolbar.vue'
+import LexicalTest from './components/LexicalTest.vue'
 </script>
 
 <template>
   <div class="app h-screen flex flex-col bg-white">
-    <!-- 顶部工具栏 -->
-    <Toolbar />
-    
-    <!-- 主内容区域 -->
-    <div class="main-container flex-1 flex overflow-hidden">
-      <!-- 侧边栏 -->
-      <Sidebar />
-      
-      <!-- 主内容区 -->
-      <MainContent />
-    </div>
+    <!-- Lexical 编辑器测试 -->
+    <LexicalTest />
   </div>
 </template>
 
