@@ -26,25 +26,25 @@ const createJavaScriptBlock = () => {
 // 创建新的 TypeScript 代码块
 const createTypeScriptBlock = () => {
   const block = blocksStore.createTypeScriptBlock(`// 在这里编写 TypeScript 代码
-interface User {
-  name: string;
-  age: number;
+
+// 类型注解示例
+const name: string = "张三";
+const age: number = 25;
+
+console.log("用户: " + name + ", 年龄: " + age);
+
+// 数组类型示例
+const numbers: number[] = [1, 2, 3, 4, 5];
+const sum: number = numbers.reduce((acc, num) => acc + num, 0);
+console.log("数组总和:", sum);
+
+// 函数类型示例
+function greet(person: string): string {
+  return "你好, " + person + "!";
 }
 
-const user: User = {
-  name: "张三",
-  age: 25
-};
-
-console.log("用户: " + user.name + ", 年龄: " + user.age);
-
-// 泛型示例
-function createArray<T>(length: number, value: T): T[] {
-  return Array(length).fill(value);
-}
-
-const numbers = createArray<number>(5, 0);
-console.log(numbers);`)
+const message: string = greet(name);
+console.log(message);`)
   selectedBlockId.value = block.id
 }
 

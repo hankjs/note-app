@@ -65,27 +65,33 @@ describe('Code Sandbox', () => {
   describe('TypeScript Execution', () => {
     it('should compile and execute TypeScript code', async () => {
       const code = `
-        interface User {
-          name: string;
-          age: number;
+        // 类型注解示例
+        const name: string = "张三";
+        const age: number = 25;
+        
+        console.log("用户: " + name + ", 年龄: " + age);
+        
+        // 数组类型示例
+        const numbers: number[] = [1, 2, 3, 4, 5];
+        const sum: number = numbers.reduce((acc, num) => acc + num, 0);
+        console.log("数组总和:", sum);
+        
+        // 函数类型示例
+        function greet(person: string): string {
+          return "你好, " + person + "!";
         }
         
-        const user: User = {
-          name: "张三",
-          age: 25
-        };
-        
-        console.log("用户: " + user.name + ", 年龄: " + user.age);
-        user.age;
+        const message: string = greet(name);
+        console.log(message);
       `
       
       const result = await executeCode(code, { language: 'typescript' })
       
       expect(result.success).toBe(true)
-      expect(result.outputs).toHaveLength(1)
+      expect(result.outputs).toHaveLength(3)
       expect(result.outputs[0].content).toEqual(['用户: 张三, 年龄: 25'])
-      // result.result 可能为 undefined，因为代码执行的结果没有被返回
-      expect(result.success).toBe(true)
+      expect(result.outputs[1].content).toEqual(['数组总和:', 15])
+      expect(result.outputs[2].content).toEqual(['你好, 张三!'])
     })
 
     it('should handle TypeScript interface compilation without "Unexpected identifier" error', async () => {
