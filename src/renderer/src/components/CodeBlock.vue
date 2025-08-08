@@ -304,9 +304,15 @@ watch(() => props.block.content, (newContent) => {
           ]"
         >
           <div class="flex items-center justify-between mb-1">
-            <span class="text-xs text-gray-500">
-              {{ output.type }} {{ output.level ? `(${output.level})` : '' }}
-            </span>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs text-gray-500">
+                {{ output.type }} {{ output.level ? `(${output.level})` : '' }}
+              </span>
+              <!-- 显示行数信息 -->
+              <span v-if="output.lineNumber" class="text-xs text-blue-600 font-mono">
+                L{{ output.lineNumber }}
+              </span>
+            </div>
             <div class="flex items-center space-x-2">
               <span class="text-xs text-gray-400">
                 {{ new Date(output.timestamp).toLocaleTimeString() }}

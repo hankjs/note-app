@@ -3,6 +3,7 @@ export interface CodeOutput {
   content: any
   timestamp: number
   level?: 'log' | 'warn' | 'error' | 'info'
+  lineNumber?: number // 添加行数信息
 }
 
 export interface ExecutionResult {
@@ -31,21 +32,61 @@ class CodeSandbox {
 
   private setupConsoleProxy() {
     this.consoleProxy = {
-      log: (...args: any[]) => this.addOutput('console', args, 'log'),
-      warn: (...args: any[]) => this.addOutput('console', args, 'warn'),
-      error: (...args: any[]) => this.addOutput('console', args, 'error'),
-      info: (...args: any[]) => this.addOutput('console', args, 'info'),
-      table: (data: any) => this.addOutput('table', data),
+      log: (...args: any[]) => {
+        const lineNumber = this.getCallerLineNumber()
+        this.addOutput('console', args, 'log', lineNumber)
+      },
+      warn: (...args: any[]) => {
+        const lineNumber = this.getCallerLineNumber()
+        this.addOutput('console', args, 'warn', lineNumber)
+      },
+      error: (...args: any[]) => {
+        const lineNumber = this.getCallerLineNumber()
+        this.addOutput('console', args, 'error', lineNumber)
+      },
+      info: (...args: any[]) => {
+        const lineNumber = this.getCallerLineNumber()
+        this.addOutput('console', args, 'info', lineNumber)
+      },
+      table: (data: any) => {
+        const lineNumber = this.getCallerLineNumber()
+        this.addOutput('table', data, undefined, lineNumber)
+      },
       clear: () => this.outputs = []
     }
   }
 
-  private addOutput(type: CodeOutput['type'], content: any, level?: CodeOutput['level']) {
+  private getCallerLineNumber(): number | undefined {
+    try {
+      const stack = new Error().stack
+      if (!stack) return undefined
+      
+      const lines = stack.split('\n')
+      // 查找包含用户代码的行（跳过前几行系统调用）
+      for (let i = 3; i < lines.length; i++) {
+        const line = lines[i]
+        // 如果行包含 eval 或 Function，说明是用户代码
+        if (line.includes('eval') || line.includes('Function')) {
+          // 尝试提取行号
+          const match = line.match(/:(\d+):(\d+)/)
+          if (match) {
+            return parseInt(match[1])
+          }
+        }
+      }
+      return undefined
+    } catch {
+      return undefined
+    }
+  }
+
+  private addOutput(type: CodeOutput['type'], content: any, level?: CodeOutput['level'], lineNumber?: number) {
     this.outputs.push({
       type,
       content,
       level,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      lineNumber
     })
   }
 
