@@ -11,10 +11,11 @@ test/
 ├── setup.ts                    # 测试环境设置
 ├── README.md                   # 测试文档
 └── unit/                       # 单元测试
-    ├── typescriptCompiler.test.ts  # TypeScript 编译器测试
-    ├── codeSandbox.test.ts         # 代码沙箱测试
-    └── stores/                     # Store 测试
-        └── codeBlocks.test.ts      # 代码块状态管理测试
+    ├── typescriptCompiler.test.ts          # TypeScript 编译器测试
+    ├── typescriptCompilerRegression.test.ts # TypeScript 编译器回归测试
+    ├── codeSandbox.test.ts                 # 代码沙箱测试
+    └── stores/                             # Store 测试
+        └── codeBlocks.test.ts              # 代码块状态管理测试
 ```
 
 ## 测试命令
@@ -33,6 +34,30 @@ pnpm run test:run
 pnpm run test:coverage
 ```
 
+### 使用 Vitest 过滤器
+
+Vitest 提供了强大的过滤器功能，可以精确控制运行哪些测试：
+
+```bash
+# 按文件名过滤
+pnpm test:run test/unit/codeSandbox.safe
+pnpm test:run test/unit/typescriptCompiler
+pnpm test:run test/unit/stores/
+
+# 按测试名称过滤（使用 -t 或 --testNamePattern）
+pnpm test:run -t "should execute"
+pnpm test:run -t "TypeScript"
+pnpm test:run -t "JavaScript"
+
+# 按测试套件名称过滤
+pnpm test:run -t "Code Sandbox"
+pnpm test:run -t "TypeScript Compiler"
+
+# 组合使用
+pnpm test:run test/unit/ -t "TypeScript"
+pnpm test:run test/unit/stores/ -t "should create"
+```
+
 ## 测试覆盖范围
 
 ### 1. TypeScript 编译器 (`typescriptCompiler.test.ts`)
@@ -46,9 +71,29 @@ pnpm run test:coverage
 - ✅ 语法检查功能
 - ✅ 代码格式化功能
 
-### 2. 代码沙箱 (`codeSandbox.test.ts`)
+### 2. TypeScript 编译器回归测试 (`typescriptCompilerRegression.test.ts`)
+
+专门测试之前出现的编译异常和边界情况：
+
+- ✅ "Unexpected identifier" 错误修复验证
+- ✅ 复杂 TypeScript 特性测试（接口继承、泛型、联合类型）
+- ✅ 语法检查回归测试
+- ✅ 边界情况处理（空接口、方法签名等）
+
+### 3. 代码沙箱 (`codeSandbox.test.ts`)
 
 测试代码执行环境：
+
+- ✅ JavaScript 代码执行
+- ✅ TypeScript 代码编译和执行
+- ✅ 错误处理
+- ⏭️ 超时机制（已跳过，在安全测试中验证）
+- ✅ 控制台输出捕获
+- ✅ 安全执行环境
+
+### 4. 代码沙箱安全测试 (`codeSandbox.safe.test.ts`)
+
+安全的代码执行测试，避免死循环：
 
 - ✅ JavaScript 代码执行
 - ✅ TypeScript 代码编译和执行
@@ -57,7 +102,7 @@ pnpm run test:coverage
 - ✅ 控制台输出捕获
 - ✅ 安全执行环境
 
-### 3. 代码块状态管理 (`codeBlocks.test.ts`)
+### 5. 代码块状态管理 (`codeBlocks.test.ts`)
 
 测试 Pinia store 的状态管理：
 
@@ -124,16 +169,29 @@ pnpm run test:coverage
 1. **模块导入错误**: 检查路径别名配置
 2. **类型错误**: 确保 TypeScript 配置正确
 3. **环境问题**: 检查测试设置文件
+4. **内存不足**: 使用 `pnpm run test:safe` 运行安全的测试
+5. **死循环**: 避免在测试中使用真正的无限循环
+
+### 内存优化
+
+如果遇到内存不足的问题，可以：
+
+1. **使用安全的测试**: `pnpm test:run test/unit/codeSandbox.safe`
+2. **分别运行测试**: `pnpm test:run test/unit/typescriptCompiler`, `pnpm test:run test/unit/stores/`
+3. **调整 Vitest 配置**: 使用单进程模式减少内存使用
 
 ### 调试测试
 
 ```bash
 # 运行单个测试文件
-pnpm run test typescriptCompiler.test.ts
+pnpm test:run test/unit/typescriptCompiler.test.ts
 
 # 运行特定测试
-pnpm run test -- -t "should compile simple TypeScript code"
+pnpm test:run -t "should compile simple TypeScript code"
 
 # 调试模式
-pnpm run test -- --reporter=verbose
+pnpm test:run --reporter=verbose
+
+# 监听模式（开发时使用）
+pnpm vitest test/unit/typescriptCompiler.test.ts
 ```

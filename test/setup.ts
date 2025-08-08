@@ -52,3 +52,11 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
 afterEach(() => {
   vi.clearAllMocks()
 })
+
+// 全局清理
+afterAll(() => {
+  // 强制垃圾回收
+  if (global.gc) {
+    global.gc()
+  }
+})

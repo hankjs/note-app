@@ -31,12 +31,12 @@ class TypeScriptCompiler {
    */
   compile(code: string, options: CompileOptions = {}): CompileResult {
     const compilerOptions: ts.CompilerOptions = {
-      target: options.target || this.defaultOptions.target,
-      module: options.module || this.defaultOptions.module,
-      strict: options.strict ?? this.defaultOptions.strict,
-      esModuleInterop: options.esModuleInterop ?? this.defaultOptions.esModuleInterop,
-      allowSyntheticDefaultImports: options.allowSyntheticDefaultImports ?? this.defaultOptions.allowSyntheticDefaultImports,
-      skipLibCheck: options.skipLibCheck ?? this.defaultOptions.skipLibCheck,
+      target: ts.ScriptTarget.ES2020,
+      module: ts.ModuleKind.None,
+      strict: false,
+      esModuleInterop: true,
+      allowSyntheticDefaultImports: true,
+      skipLibCheck: true,
       noEmitOnError: false,
       noImplicitAny: false,
       noImplicitReturns: false,
@@ -52,64 +52,14 @@ class TypeScriptCompiler {
       noImplicitOverride: false,
       noPropertyAccessFromIndexSignature: false,
       noUncheckedIndexedAccess: false,
-      exactOptionalPropertyTypes: false
+      exactOptionalPropertyTypes: false,
+      ...options
     }
 
     try {
-      // 创建编译主机
-      const compilerHost = ts.createCompilerHost(compilerOptions)
-      
-      // 创建程序
-      const program = ts.createProgram(['temp.ts'], compilerOptions, compilerHost)
-
-      // 获取诊断信息
-      const diagnostics = ts.getPreEmitDiagnostics(program)
-
-      // 如果有错误，返回错误信息
-      if (diagnostics.length > 0) {
-        const errors = diagnostics.map(diagnostic => {
-          const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
-          if (diagnostic.file && diagnostic.start) {
-            const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start)
-            return `Line ${line + 1}, Column ${character + 1}: ${message}`
-          }
-          return message
-        }).join('\n')
-
-        return {
-          success: false,
-          error: errors,
-          diagnostics
-        }
-      }
-
-      // 编译代码
+      // 直接使用 transpileModule，这是最简单和最可靠的方法
       const result = ts.transpileModule(code, {
-        compilerOptions: {
-          ...compilerOptions,
-          target: ts.ScriptTarget.ES2020,
-          module: ts.ModuleKind.None,
-          strict: false,
-          esModuleInterop: true,
-          allowSyntheticDefaultImports: true,
-          skipLibCheck: true,
-          noEmitOnError: false,
-          noImplicitAny: false,
-          noImplicitReturns: false,
-          noImplicitThis: false,
-          noUnusedLocals: false,
-          noUnusedParameters: false,
-          allowUnusedLabels: true,
-          allowUnreachableCode: true,
-          strictNullChecks: false,
-          strictFunctionTypes: false,
-          strictBindCallApply: false,
-          strictPropertyInitialization: false,
-          noImplicitOverride: false,
-          noPropertyAccessFromIndexSignature: false,
-          noUncheckedIndexedAccess: false,
-          exactOptionalPropertyTypes: false
-        },
+        compilerOptions,
         reportDiagnostics: true
       })
 
