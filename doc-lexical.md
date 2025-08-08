@@ -227,6 +227,11 @@ src/renderer/src/
    - 设置窗口默认尺寸为 1920x1080
    - 添加窗口最大化确保占满屏幕
    - 优化容器样式使其占满整个窗口
+9. **LexicalEditor 组件重构**：基于基础测试版本重构主编辑器组件
+   - 简化组件逻辑，使用 `lexicalSimpleTest.ts` 的全局实例
+   - 移除复杂的 composable 依赖，直接使用简单的 API
+   - 保持 Vue 组件的标准接口（v-model、事件等）
+   - 创建 `LexicalEditorTest.vue` 用于组件功能验证
 
 ### 7.1 代码清理
 - [ ] 移除不再使用的代码

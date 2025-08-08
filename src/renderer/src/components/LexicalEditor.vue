@@ -4,22 +4,21 @@
     <div 
       ref="editorRef"
       class="editor-container"
-      :class="{ 'is-editable': isEditable }"
+      contenteditable="true"
     ></div>
     
     <!-- 调试信息（开发环境） -->
     <div v-if="showDebug" class="debug-info">
       <h4>调试信息</h4>
       <p>内容长度: {{ content.length }}</p>
-      <p>可编辑: {{ isEditable }}</p>
       <p>编辑器状态: {{ editorState ? '已初始化' : '未初始化' }}</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import { useLexicalEditor } from '@/composables/useLexicalEditor'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import '@/utils/lexicalSimpleTest'
 import type { LexicalEditorConfig } from '@/types/lexical'
 
 interface Props {
@@ -44,30 +43,44 @@ const emit = defineEmits<{
 
 // 编辑器容器引用
 const editorRef = ref<HTMLElement>()
+const content = ref(props.modelValue)
+const editorState = ref<any>(null)
 
-// 使用 Lexical 编辑器 composable
-const {
-  isEditable,
-  content,
-  editorState,
-  updateContent,
-  setEditorState,
-  setRootElement,
-  focus,
-  blur,
-  destroy,
-  onUpdate,
-  onError
-} = useLexicalEditor({
-  ...props.config,
-  editable: props.config.editable ?? true
-})
+// 初始化编辑器
+const initEditor = () => {
+  if (editorRef.value) {
+    (window as any).lexicalTest.setRootElement(editorRef.value)
+    console.log('LexicalEditor: 编辑器已初始化')
+    
+    // 如果有初始内容，设置到编辑器
+    if (props.modelValue) {
+      updateContent(props.modelValue)
+    }
+  } else {
+    console.error('LexicalEditor: 编辑器元素未找到')
+  }
+}
 
-// 监听内容变化，同步到父组件
-watch(content, (newContent) => {
+// 更新内容
+const updateContent = (newContent: string) => {
+  (window as any).lexicalTest.updateContent(newContent)
+  content.value = newContent
   emit('update:modelValue', newContent)
   emit('change', newContent)
-})
+}
+
+// 获取状态
+const getState = () => {
+  const state = (window as any).lexicalTest.getState()
+  editorState.value = state
+  return state
+}
+
+// 聚焦编辑器
+const focus = () => {
+  (window as any).lexicalTest.focus()
+  emit('focus')
+}
 
 // 监听 modelValue 变化，同步到编辑器
 watch(() => props.modelValue, (newValue) => {
@@ -76,48 +89,27 @@ watch(() => props.modelValue, (newValue) => {
   }
 }, { immediate: true })
 
-// 监听编辑器更新
-onUpdate((editorState) => {
-  // 编辑器状态更新时的处理
-  console.log('Editor updated:', editorState)
-})
-
-// 监听编辑器错误
-onError((error) => {
-  emit('error', error)
-})
-
 // 组件挂载后初始化编辑器
-onMounted(async () => {
-  await nextTick()
+onMounted(() => {
+  console.log('LexicalEditor: 组件已挂载')
   
-  // 等待编辑器创建完成
+  // 自动初始化编辑器
   setTimeout(() => {
-    if (editorRef.value) {
-      // 将编辑器挂载到 DOM 元素
-      setRootElement(editorRef.value)
-      
-      // 如果有初始内容，设置到编辑器
-      if (props.modelValue) {
-        updateContent(props.modelValue)
-      }
-    }
-  }, 200)
+    initEditor()
+  }, 100)
 })
 
 // 组件卸载时清理
 onUnmounted(() => {
-  destroy()
+  console.log('LexicalEditor: 组件已卸载')
 })
 
 // 暴露方法给父组件
 defineExpose({
   focus,
-  blur,
   updateContent,
-  setEditorState,
-  setRootElement,
-  destroy
+  getState,
+  setRootElement: initEditor
 })
 </script>
 
@@ -130,28 +122,19 @@ defineExpose({
 .editor-container {
   width: 100%;
   min-height: 200px;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.375rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
   padding: 1rem;
   background-color: white;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.6;
-  overflow-y: auto;
+  outline: none;
+  transition: border-color 0.2s;
 }
 
-.editor-container:focus-within {
-  outline: none;
+.editor-container:focus {
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.editor-container.is-editable {
-  cursor: text;
-}
-
-.editor-container:not(.is-editable) {
-  cursor: default;
-  background-color: #f9fafb;
 }
 
 /* 编辑器内容样式 */

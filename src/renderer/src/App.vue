@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import LexicalBasicTest from './components/LexicalBasicTest.vue'
+import LexicalEditorTest from './components/LexicalEditorTest.vue'
 </script>
 
 <template>
   <div class="app h-screen flex flex-col bg-white">
-    <!-- Lexical 基础功能测试 -->
-    <LexicalBasicTest />
+    <!-- LexicalEditor 组件测试 -->
+    <LexicalEditorTest />
   </div>
 </template>
 
