@@ -37,7 +37,9 @@ const editContent = ref('')
 
 // 计算属性
 const isJavaScript = computed(() => props.block.type === 'javascript')
+const isTypeScript = computed(() => props.block.type === 'typescript')
 const isMarkdown = computed(() => props.block.type === 'markdown')
+const isCodeBlock = computed(() => isJavaScript.value || isTypeScript.value)
 const isRunning = computed(() => props.block.status === 'running')
 const hasError = computed(() => props.block.status === 'error')
 const hasOutput = computed(() => props.block.outputs.length > 0)
@@ -77,7 +79,7 @@ const cancelEdit = () => {
 
 // 运行代码
 const runCode = async () => {
-  if (!isJavaScript.value) return
+  if (!isCodeBlock.value) return
   
   // 验证代码语法
   const validation = validateCode(props.block.content)
@@ -151,7 +153,7 @@ watch(() => props.block.content, (newContent) => {
     <div class="block-header bg-gray-50 px-4 py-2 flex items-center justify-between border-b border-gray-200">
       <div class="flex items-center space-x-2">
         <span class="text-xs font-medium text-gray-600 uppercase">
-          {{ isJavaScript ? 'JavaScript' : 'Markdown' }}
+          {{ isJavaScript ? 'JavaScript' : isTypeScript ? 'TypeScript' : 'Markdown' }}
         </span>
         
         <!-- 状态指示器 -->
@@ -168,9 +170,9 @@ watch(() => props.block.content, (newContent) => {
       </div>
 
       <div class="flex items-center space-x-1">
-        <!-- 运行按钮 (仅 JavaScript) -->
+        <!-- 运行按钮 (代码块) -->
         <button
-          v-if="isJavaScript"
+          v-if="isCodeBlock"
           @click.stop="runCode"
           :disabled="isRunning"
           :class="[
@@ -230,11 +232,13 @@ watch(() => props.block.content, (newContent) => {
       <div v-if="isEditing" class="p-4">
         <textarea
           v-model="editContent"
-          :class="[
-            'w-full min-h-[200px] p-3 border rounded font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500',
-            isJavaScript ? 'bg-gray-900 text-green-400' : 'bg-white text-gray-800'
-          ]"
-          :placeholder="isJavaScript ? '// 输入 JavaScript 代码...' : '# 输入 Markdown 内容...'"
+                      :class="[
+              'w-full min-h-[200px] p-3 border rounded font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500',
+              isCodeBlock 
+                ? (isTypeScript ? 'bg-gray-900 text-blue-400' : 'bg-gray-900 text-green-400')
+                : 'bg-white text-gray-800'
+            ]"
+          :placeholder="isJavaScript ? '// 输入 JavaScript 代码...' : isTypeScript ? '// 输入 TypeScript 代码...' : '# 输入 Markdown 内容...'"
         ></textarea>
         
         <div class="flex justify-end space-x-2 mt-2">
@@ -255,11 +259,16 @@ watch(() => props.block.content, (newContent) => {
 
       <!-- 显示模式 -->
       <div v-else class="p-4">
-        <!-- JavaScript 代码显示 -->
-        <div v-if="isJavaScript" class="space-y-4">
+        <!-- 代码显示 -->
+        <div v-if="isCodeBlock" class="space-y-4">
           <pre 
             @dblclick="startEdit"
-            class="bg-gray-900 text-green-400 p-4 rounded font-mono text-sm overflow-x-auto cursor-pointer hover:bg-gray-800 transition-colors"
+            :class="[
+              'p-4 rounded font-mono text-sm overflow-x-auto cursor-pointer transition-colors',
+              isTypeScript 
+                ? 'bg-gray-900 text-blue-400 hover:bg-gray-800' 
+                : 'bg-gray-900 text-green-400 hover:bg-gray-800'
+            ]"
           ><code>{{ props.block.content || '// 点击编辑代码...' }}</code></pre>
         </div>
 

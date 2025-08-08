@@ -10,7 +10,7 @@ export function useCodeExecution() {
   // 执行单个代码块
   const executeBlock = async (blockId: string, context: ExecutionContext = {}) => {
     const block = blocksStore.getBlock(blockId)
-    if (!block || block.type !== 'javascript') {
+    if (!block || (block.type !== 'javascript' && block.type !== 'typescript')) {
       return
     }
 
@@ -29,6 +29,7 @@ export function useCodeExecution() {
         memoryLimit: 128, // 128MB 内存限制
         allowNetwork: false, // 不允许网络请求
         allowFileSystem: false, // 不允许文件系统访问
+        language: block.type, // 设置语言类型
         ...context
       })
 
@@ -45,10 +46,10 @@ export function useCodeExecution() {
     }
   }
 
-  // 执行所有 JavaScript 代码块
+  // 执行所有代码块
   const executeAllBlocks = async (context: ExecutionContext = {}) => {
-    const jsBlocks = blocksStore.javascriptBlocks
-    const blockIds = jsBlocks.map(block => block.id)
+    const codeBlocks = blocksStore.blocks.filter(b => b.type === 'javascript' || b.type === 'typescript')
+    const blockIds = codeBlocks.map(block => block.id)
 
     for (const blockId of blockIds) {
       await executeBlock(blockId, context)
@@ -73,15 +74,15 @@ export function useCodeExecution() {
   const executionStats = computed(() => {
     const blocks = blocksStore.blocks
     const totalBlocks = blocks.length
-    const jsBlocks = blocks.filter(b => b.type === 'javascript')
-    const executedBlocks = jsBlocks.filter(b => b.status === 'success' || b.status === 'error')
-    const runningBlocks = jsBlocks.filter(b => b.status === 'running')
-    const errorBlocks = jsBlocks.filter(b => b.status === 'error')
-    const totalExecutionTime = jsBlocks.reduce((sum, b) => sum + (b.executionTime || 0), 0)
+    const codeBlocks = blocks.filter(b => b.type === 'javascript' || b.type === 'typescript')
+    const executedBlocks = codeBlocks.filter(b => b.status === 'success' || b.status === 'error')
+    const runningBlocks = codeBlocks.filter(b => b.status === 'running')
+    const errorBlocks = codeBlocks.filter(b => b.status === 'error')
+    const totalExecutionTime = codeBlocks.reduce((sum, b) => sum + (b.executionTime || 0), 0)
 
     return {
       totalBlocks,
-      jsBlocks: jsBlocks.length,
+      codeBlocks: codeBlocks.length,
       executedBlocks: executedBlocks.length,
       runningBlocks: runningBlocks.length,
       errorBlocks: errorBlocks.length,

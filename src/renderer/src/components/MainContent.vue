@@ -8,7 +8,8 @@ import {
   StopIcon,
   TrashIcon,
   DocumentTextIcon,
-  CodeBracketIcon
+  CodeBracketIcon,
+  CommandLineIcon
 } from '@heroicons/vue/24/outline'
 
 const blocksStore = useCodeBlocksStore()
@@ -19,6 +20,31 @@ const selectedBlockId = ref<string | null>(null)
 // 创建新的 JavaScript 代码块
 const createJavaScriptBlock = () => {
   const block = blocksStore.createJavaScriptBlock('// 在这里编写 JavaScript 代码\nconsole.log("Hello, World!");')
+  selectedBlockId.value = block.id
+}
+
+// 创建新的 TypeScript 代码块
+const createTypeScriptBlock = () => {
+  const block = blocksStore.createTypeScriptBlock(`// 在这里编写 TypeScript 代码
+interface User {
+  name: string;
+  age: number;
+}
+
+const user: User = {
+  name: "张三",
+  age: 25
+};
+
+console.log("用户: " + user.name + ", 年龄: " + user.age);
+
+// 泛型示例
+function createArray<T>(length: number, value: T): T[] {
+  return Array(length).fill(value);
+}
+
+const numbers = createArray<number>(5, 0);
+console.log(numbers);`)
   selectedBlockId.value = block.id
 }
 
@@ -69,8 +95,17 @@ const duplicateBlock = (blockId: string) => {
         </button>
         
         <button
-          @click="createMarkdownBlock"
+          @click="createTypeScriptBlock"
           class="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+          title="新建 TypeScript 代码块"
+        >
+          <CommandLineIcon class="w-4 h-4" />
+          <span>TS</span>
+        </button>
+        
+        <button
+          @click="createMarkdownBlock"
+          class="flex items-center space-x-1 px-3 py-1.5 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 transition-colors"
           title="新建 Markdown 块"
         >
           <DocumentTextIcon class="w-4 h-4" />
@@ -111,7 +146,7 @@ const duplicateBlock = (blockId: string) => {
       <div class="flex items-center space-x-2">
         <!-- 执行统计 -->
         <div class="text-xs text-gray-600">
-          {{ executionStats.jsBlocks }} JS块 | 
+          {{ executionStats.codeBlocks }} 代码块 | 
           {{ executionStats.executedBlocks }} 已执行 | 
           {{ executionStats.errorBlocks }} 错误
         </div>
@@ -135,8 +170,15 @@ const duplicateBlock = (blockId: string) => {
               <span>JavaScript 代码块</span>
             </button>
             <button
-              @click="createMarkdownBlock"
+              @click="createTypeScriptBlock"
               class="flex items-center space-x-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            >
+              <CommandLineIcon class="w-4 h-4" />
+              <span>TypeScript 代码块</span>
+            </button>
+            <button
+              @click="createMarkdownBlock"
+              class="flex items-center space-x-1 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
             >
               <DocumentTextIcon class="w-4 h-4" />
               <span>Markdown 块</span>

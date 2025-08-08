@@ -4,7 +4,7 @@ import { CodeOutput, ExecutionResult } from '@/utils/codeSandbox'
 
 export interface CodeBlock {
   id: string
-  type: 'javascript' | 'markdown'
+  type: 'javascript' | 'typescript' | 'markdown'
   content: string
   outputs: CodeOutput[]
   status: 'idle' | 'running' | 'success' | 'error'
@@ -32,7 +32,7 @@ export const useCodeBlocksStore = defineStore('codeBlocks', () => {
   )
 
   // 创建新的代码块
-  const createBlock = (type: 'javascript' | 'markdown', content: string = ''): CodeBlock => {
+  const createBlock = (type: 'javascript' | 'typescript' | 'markdown', content: string = ''): CodeBlock => {
     const block: CodeBlock = {
       id: generateBlockId(),
       type,
@@ -50,6 +50,11 @@ export const useCodeBlocksStore = defineStore('codeBlocks', () => {
   // 创建 JavaScript 代码块
   const createJavaScriptBlock = (content: string = ''): CodeBlock => {
     return createBlock('javascript', content)
+  }
+
+  // 创建 TypeScript 代码块
+  const createTypeScriptBlock = (content: string = ''): CodeBlock => {
+    return createBlock('typescript', content)
   }
 
   // 创建 Markdown 代码块
@@ -207,6 +212,7 @@ export const useCodeBlocksStore = defineStore('codeBlocks', () => {
     // 方法
     createBlock,
     createJavaScriptBlock,
+    createTypeScriptBlock,
     createMarkdownBlock,
     updateBlockContent,
     updateBlockStatus,

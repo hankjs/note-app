@@ -18,6 +18,7 @@ export interface ExecutionContext {
   memoryLimit?: number
   allowNetwork?: boolean
   allowFileSystem?: boolean
+  language?: 'javascript' | 'typescript'
 }
 
 class CodeSandbox {
@@ -53,6 +54,29 @@ class CodeSandbox {
     this.outputs = []
 
     try {
+      let executableCode = code
+
+      // 如果是 TypeScript，先编译
+      if (context.language === 'typescript') {
+        const { compileTypeScript } = await import('./typescriptCompiler')
+        const compileResult = compileTypeScript(code)
+        
+        if (!compileResult.success) {
+          return {
+            success: false,
+            outputs: [{
+              type: 'error',
+              content: compileResult.error || 'TypeScript 编译失败',
+              timestamp: Date.now()
+            }],
+            executionTime: Date.now() - startTime,
+            error: compileResult.error
+          }
+        }
+        
+        executableCode = compileResult.code || code
+      }
+
       // 创建安全的执行环境
       const safeGlobals = {
         console: this.consoleProxy,
@@ -114,7 +138,7 @@ class CodeSandbox {
       })
 
       // 创建执行函数
-      const executeFunction = new Function(...Object.keys(safeGlobals), code)
+      const executeFunction = new Function(...Object.keys(safeGlobals), executableCode)
       
       // 执行代码
       const executionPromise = Promise.resolve(executeFunction(...Object.values(safeGlobals)))
