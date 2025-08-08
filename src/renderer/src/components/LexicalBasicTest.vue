@@ -99,9 +99,10 @@ onUnmounted(() => {
 
 <style scoped>
 .lexical-basic-test {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
+  width: 100%;
+  height: 100vh;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
 .test-controls {
@@ -129,7 +130,35 @@ onUnmounted(() => {
 .editor-section,
 .state-section,
 .log-section {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+}
+
+.lexical-basic-test {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.test-controls {
+  flex-shrink: 0;
+}
+
+.editor-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.editor-container {
+  flex: 1;
+  min-height: 0;
+}
+
+.state-section,
+.log-section {
+  flex-shrink: 0;
+  max-height: 200px;
 }
 
 .editor-section h3,
@@ -163,10 +192,10 @@ onUnmounted(() => {
   background-color: #f9fafb;
   border: 1px solid #e5e7eb;
   border-radius: 0.375rem;
-  padding: 1rem;
+  padding: 0.5rem;
   font-size: 0.75rem;
   color: #374151;
-  max-height: 300px;
+  height: 150px;
   overflow-y: auto;
   white-space: pre-wrap;
 }
@@ -175,8 +204,8 @@ onUnmounted(() => {
   background-color: #1f2937;
   border: 1px solid #374151;
   border-radius: 0.375rem;
-  padding: 1rem;
-  max-height: 200px;
+  padding: 0.5rem;
+  height: 150px;
   overflow-y: auto;
 }
 
