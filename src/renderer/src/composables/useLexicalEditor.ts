@@ -2,18 +2,17 @@ import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { 
   createEditor, 
   LexicalEditor, 
-  EditorState,
-  $getRoot,
-  $createParagraphNode,
-  $createTextNode
+  EditorState
 } from 'lexical'
-import { registerRichText } from '@lexical/rich-text'
-import { $convertFromMarkdownString } from '@lexical/markdown'
+import { registerRichText, HeadingNode, QuoteNode } from '@lexical/rich-text'
+import { registerHistory, createEmptyHistoryState } from '@lexical/history'
+import { mergeRegister } from '@lexical/utils'
 
 import type { 
   LexicalEditorConfig, 
   UseLexicalEditorReturn
 } from '@/types/lexical'
+import { editorStateToText, textToEditorState, createDefaultContent } from '@/utils/lexicalUtils'
 
 export function useLexicalEditor(config: Partial<LexicalEditorConfig> = {}): UseLexicalEditorReturn {
   // 响应式状态
@@ -40,32 +39,42 @@ export function useLexicalEditor(config: Partial<LexicalEditorConfig> = {}): Use
       editor.value = null
     }
 
-    // 创建编辑器
-    const newEditor = createEditor({
+    // 创建编辑器配置
+    const initialConfig = {
       namespace: defaultConfig.namespace,
-      onError: (error) => {
+      nodes: [HeadingNode, QuoteNode],
+      onError: (error: Error) => {
         console.error('Lexical Editor Error:', error)
         errorCallbacks.value.forEach(callback => callback(error))
       },
-      editable: isEditable.value
-    })
+      theme: {
+        // 添加主题配置
+        quote: 'PlaygroundEditorTheme__quote',
+      },
+    }
 
-    // 注册富文本节点
-    registerRichText(newEditor)
+    // 创建编辑器
+    const newEditor = createEditor(initialConfig)
+
+    // 注册插件
+    mergeRegister(
+      registerRichText(newEditor),
+      registerHistory(newEditor, createEmptyHistoryState(), 300)
+    )
 
     // 监听编辑器更新
     newEditor.registerUpdateListener(({ editorState: newEditorState }) => {
       editorState.value = newEditorState
       
-      // 更新内容（简化版本）
-      content.value = JSON.stringify(newEditorState.toJSON())
+      // 使用工具函数转换编辑器状态为文本
+      content.value = editorStateToText(newEditorState)
       
       // 触发更新回调
       updateCallbacks.value.forEach(callback => callback(newEditorState))
     })
 
     // 初始化内容
-    initializeDefaultContent(newEditor)
+    createDefaultContent(newEditor)
 
     editor.value = newEditor
 
@@ -77,40 +86,10 @@ export function useLexicalEditor(config: Partial<LexicalEditorConfig> = {}): Use
     }
   }
 
-  // 初始化默认内容
-  const initializeDefaultContent = (editorInstance: LexicalEditor) => {
-    editorInstance.update(() => {
-      const root = $getRoot()
-      if (root.getFirstChild() === null) {
-        const paragraph = $createParagraphNode()
-        const text = $createTextNode('开始编辑...')
-        paragraph.append(text)
-        root.append(paragraph)
-      }
-    })
-  }
-
   // 更新内容
   const updateContent = (newContent: string) => {
     if (!editor.value) return
-
-    editor.value.update(() => {
-      const root = $getRoot()
-      root.clear()
-      
-      if (newContent) {
-        try {
-          // 尝试解析为 Markdown
-          $convertFromMarkdownString(newContent)
-        } catch (error) {
-          // 如果解析失败，作为纯文本处理
-          const paragraph = $createParagraphNode()
-          const text = $createTextNode(newContent)
-          paragraph.append(text)
-          root.append(paragraph)
-        }
-      }
-    })
+    textToEditorState(editor.value, newContent)
   }
 
   // 设置编辑器状态
