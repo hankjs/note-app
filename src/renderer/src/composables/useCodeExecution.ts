@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import { useCodeBlocksStore } from '@/stores/codeBlocks'
 import { executeCode, ExecutionContext } from '@/utils/codeSandbox'
+import { checkTypeScriptSyntax } from '@/utils/typescriptCompiler'
 
 export function useCodeExecution() {
   const blocksStore = useCodeBlocksStore()
@@ -92,11 +93,23 @@ export function useCodeExecution() {
   })
 
   // 检查代码块是否有语法错误
-  const validateCode = (code: string): { valid: boolean; error?: string } => {
+  const validateCode = (code: string, language: 'javascript' | 'typescript' = 'javascript'): { valid: boolean; error?: string } => {
     try {
-      // 使用 Function 构造函数检查语法
-      new Function(code)
-      return { valid: true }
+      if (language === 'typescript') {
+        // 使用 TypeScript 编译器检查语法
+        const result = checkTypeScriptSyntax(code)
+        if (!result.success) {
+          return { 
+            valid: false, 
+            error: result.error || 'TypeScript 语法错误' 
+          }
+        }
+        return { valid: true }
+      } else {
+        // 使用 Function 构造函数检查 JavaScript 语法
+        new Function(code)
+        return { valid: true }
+      }
     } catch (error) {
       return { 
         valid: false, 
@@ -122,7 +135,7 @@ export function useCodeExecution() {
   // 获取代码块依赖关系
   const getBlockDependencies = (blockId: string): string[] => {
     const block = blocksStore.getBlock(blockId)
-    if (!block || block.type !== 'javascript') {
+    if (!block || (block.type !== 'javascript' && block.type !== 'typescript')) {
       return []
     }
 
@@ -132,7 +145,7 @@ export function useCodeExecution() {
 
     // 检查是否使用了其他代码块的变量
     blocksStore.blocks.forEach(otherBlock => {
-      if (otherBlock.id !== blockId && otherBlock.type === 'javascript') {
+      if (otherBlock.id !== blockId && (otherBlock.type === 'javascript' || otherBlock.type === 'typescript')) {
         // 这里可以实现更复杂的依赖分析
         // 目前只是简单的文本匹配
         if (code.includes(otherBlock.id)) {

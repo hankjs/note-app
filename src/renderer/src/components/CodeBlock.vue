@@ -79,10 +79,11 @@ const cancelEdit = () => {
 
 // 运行代码
 const runCode = async () => {
+  debugger
   if (!isCodeBlock.value) return
   
   // 验证代码语法
-  const validation = validateCode(props.block.content)
+  const validation = validateCode(props.block.content, props.block.type as 'javascript' | 'typescript')
   if (!validation.valid) {
     blocksStore.updateBlockStatus(props.block.id, 'error', undefined, validation.error)
     return

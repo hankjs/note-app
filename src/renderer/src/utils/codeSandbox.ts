@@ -50,6 +50,7 @@ class CodeSandbox {
   }
 
   async executeCode(code: string, context: ExecutionContext = {}): Promise<ExecutionResult> {
+    debugger
     const startTime = Date.now()
     this.outputs = []
 
