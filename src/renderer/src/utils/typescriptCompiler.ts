@@ -108,90 +108,43 @@ class TypeScriptCompiler {
     }
 
     try {
-      // 添加 console 的类型声明
-      const codeWithConsole = `
-        declare const console: {
-          log(...args: any[]): void;
-          error(...args: any[]): void;
-          warn(...args: any[]): void;
-          info(...args: any[]): void;
-        };
-        
-        ${code}
-      `;
-      
-      // 使用 createProgram 进行完整的类型检查
-      const compilerOptions: ts.CompilerOptions = {
-        target: ts.ScriptTarget.ES2020,
-        module: ts.ModuleKind.None,
-        lib: ['es2020'], // 只使用 ES2020 库
-        strict: true, // 启用严格模式
-        esModuleInterop: true,
-        allowSyntheticDefaultImports: true,
-        skipLibCheck: true,
-        noEmit: true,
-        noEmitOnError: true, // 错误时不输出
-        noImplicitAny: true, // 不允许隐式 any
-        noImplicitReturns: true, // 不允许隐式返回
-        noImplicitThis: true, // 不允许隐式 this
-        noUnusedLocals: false, // 允许未使用的局部变量
-        noUnusedParameters: false, // 允许未使用的参数
-        allowUnusedLabels: true,
-        allowUnreachableCode: true,
-        strictNullChecks: true, // 启用严格空值检查
-        strictFunctionTypes: true, // 启用严格函数类型检查
-        strictBindCallApply: true, // 启用严格 bind/call/apply 检查
-        strictPropertyInitialization: true, // 启用严格属性初始化检查
-        noImplicitOverride: false,
-        noPropertyAccessFromIndexSignature: false,
-        noUncheckedIndexedAccess: false,
-        exactOptionalPropertyTypes: false
-      }
-
-      // 创建源文件
-      const sourceFile = ts.createSourceFile(
-        'temp.ts',
-        codeWithConsole,
-        ts.ScriptTarget.ES2020,
-        true
-      )
-
-      // 创建程序，使用自定义文件系统
-      const program = ts.createProgram(['temp.ts'], compilerOptions, {
-        getSourceFile: (fileName) => {
-          if (fileName === 'temp.ts') {
-            return sourceFile
-          }
-          return undefined
+      // 使用 transpileModule 进行语法检查，启用更严格的类型检查
+      const result = ts.transpileModule(code, {
+        compilerOptions: {
+          target: ts.ScriptTarget.ESNext,
+          module: ts.ModuleKind.None,
+          lib: ['esnext'], // 使用 ESNext 库
+          strict: true, // 启用严格模式
+          esModuleInterop: true,
+          allowSyntheticDefaultImports: true,
+          skipLibCheck: false, // 不跳过库检查
+          noEmit: true,
+          noEmitOnError: true, // 错误时不输出
+          noImplicitAny: true, // 不允许隐式 any
+          noImplicitReturns: true, // 不允许隐式返回
+          noImplicitThis: true, // 不允许隐式 this
+          noUnusedLocals: false, // 允许未使用的局部变量
+          noUnusedParameters: false, // 允许未使用的参数
+          allowUnusedLabels: true,
+          allowUnreachableCode: true,
+          strictNullChecks: true, // 启用严格空值检查
+          strictFunctionTypes: true, // 启用严格函数类型检查
+          strictBindCallApply: true, // 启用严格 bind/call/apply 检查
+          strictPropertyInitialization: true, // 启用严格属性初始化检查
+          noImplicitOverride: false,
+          noPropertyAccessFromIndexSignature: false,
+          noUncheckedIndexedAccess: false,
+          exactOptionalPropertyTypes: false
         },
-        writeFile: () => {},
-        getCurrentDirectory: () => '/',
-        getDirectories: () => [],
-        fileExists: (fileName) => fileName === 'temp.ts',
-        readFile: (fileName) => fileName === 'temp.ts' ? codeWithConsole : undefined,
-        getDefaultLibFileName: () => 'lib.d.ts',
-        getCanonicalFileName: (fileName) => fileName,
-        useCaseSensitiveFileNames: () => false,
-        getNewLine: () => '\n'
+        reportDiagnostics: true
       })
 
-      // 获取诊断信息
-      const diagnostics = ts.getPreEmitDiagnostics(program)
-
-      // 过滤掉库文件相关的错误，只保留用户代码中的错误
-      const userCodeErrors = diagnostics.filter(diagnostic => {
-        // 只保留与我们的源文件相关的错误
-        return diagnostic.file && diagnostic.file.fileName === 'temp.ts'
-      })
-
-      if (userCodeErrors.length > 0) {
-        const errors = userCodeErrors.map(diagnostic => {
+      if (result.diagnostics && result.diagnostics.length > 0) {
+        const errors = result.diagnostics.map(diagnostic => {
           const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
           if (diagnostic.file && diagnostic.start) {
             const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start)
-            // 调整行号，因为我们添加了类型声明
-            const adjustedLine = line - 6 // 减去类型声明的行数
-            return `Line ${adjustedLine + 1}, Column ${character + 1}: ${message}`
+            return `Line ${line + 1}, Column ${character + 1}: ${message}`
           }
           return message
         }).join('\n')
@@ -199,7 +152,7 @@ class TypeScriptCompiler {
         return {
           success: false,
           error: errors,
-          diagnostics: userCodeErrors
+          diagnostics: result.diagnostics
         }
       }
 
