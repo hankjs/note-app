@@ -4,12 +4,26 @@
 import { createEditor, $getRoot, $createParagraphNode, $createTextNode } from 'lexical'
 import { registerRichText, HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { registerHistory, createEmptyHistoryState } from '@lexical/history'
+import { 
+  registerList, 
+  ListNode, 
+  ListItemNode 
+} from '@lexical/list'
+import { 
+  LinkNode 
+} from '@lexical/link'
 import { mergeRegister } from '@lexical/utils'
 
 // 创建编辑器
 const editor = createEditor({
   namespace: 'Simple Test',
-  nodes: [HeadingNode, QuoteNode],
+  nodes: [
+    HeadingNode, 
+    QuoteNode, 
+    ListNode, 
+    ListItemNode, 
+    LinkNode
+  ],
   onError: (error: Error) => {
     console.error('Editor Error:', error)
   }
@@ -18,7 +32,9 @@ const editor = createEditor({
 // 注册插件
 mergeRegister(
   registerRichText(editor),
-  registerHistory(editor, createEmptyHistoryState(), 300)
+  registerHistory(editor, createEmptyHistoryState(), 300),
+  registerList(editor)
+  // 注意：@lexical/link 不需要单独的注册函数，只需要添加 LinkNode 到节点列表
 )
 
 // 监听更新
