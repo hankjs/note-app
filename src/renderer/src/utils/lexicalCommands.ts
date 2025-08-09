@@ -56,7 +56,17 @@ export type BlockType = keyof typeof BLOCK_TYPES
 
 // 格式化文本命令
 export function formatText(editor: any, format: TextFormatType): void {
-  editor.dispatchCommand(FORMAT_TEXT_COMMAND, format)
+  if (!editor) {
+    console.warn('Editor is not available')
+    return
+  }
+  
+  try {
+    console.log('Executing formatText command:', format)
+    editor.dispatchCommand(FORMAT_TEXT_COMMAND, format)
+  } catch (error) {
+    console.error('Failed to execute formatText command:', error)
+  }
 }
 
 // 获取当前选择的格式

@@ -63,12 +63,13 @@
       <div class="instructions">
         <h4>工具栏功能:</h4>
         <ul>
+          <li><strong>⚠️ 重要:</strong> 大部分格式化功能需要先选择文本才能生效</li>
           <li><strong>格式化:</strong> 选择文本后点击粗体、斜体、下划线等按钮</li>
-          <li><strong>标题:</strong> 使用下拉菜单选择不同级别的标题</li>
-          <li><strong>列表:</strong> 点击无序列表或有序列表按钮</li>
-          <li><strong>链接:</strong> 选择文本后点击链接按钮</li>
-          <li><strong>清除格式:</strong> 选择文本后点击清除格式按钮</li>
-          <li><strong>撤销/重做:</strong> 使用撤销和重做按钮</li>
+          <li><strong>标题:</strong> 将光标放在段落中，然后使用下拉菜单选择标题级别</li>
+          <li><strong>列表:</strong> 将光标放在段落中，点击无序列表或有序列表按钮</li>
+          <li><strong>链接:</strong> 选择文本后点击链接按钮，输入 URL</li>
+          <li><strong>清除格式:</strong> 选择已格式化的文本后点击清除格式按钮</li>
+          <li><strong>撤销/重做:</strong> 使用撤销和重做按钮（适用于所有操作）</li>
         </ul>
         
         <h4>快捷键:</h4>
@@ -155,25 +156,20 @@ const clearContent = () => {
 }
 
 const setSampleContent = () => {
-  content.value = `# Lexical 工具栏测试
+  content.value = `选择这些文字来测试格式化功能：
 
-这是一个 **粗体文本** 和 *斜体文本* 的示例。
+这是普通文本，可以选择它来测试粗体、斜体等格式。
 
-## 功能特性
+这是另一段文本，用来测试下划线和删除线。
 
-- 支持 ~~删除线~~ 和 \`行内代码\`
-- 支持多级标题
-- 支持列表功能
+这段文字可以用来测试行内代码格式。
 
-### 有序列表示例
+可以选择这一行来测试标题格式转换。
 
-1. 第一项
-2. 第二项
-3. 第三项
-
-> 这是一个引用块，用于突出显示重要内容。
-
-请尝试使用工具栏进行编辑！`
+请尝试：
+1. 选择任意文字
+2. 点击工具栏按钮
+3. 观察格式变化`
   
   addEventLog('control', '设置示例内容')
 }
@@ -185,6 +181,11 @@ const clearEventLog = () => {
 // 组件挂载
 onMounted(() => {
   addEventLog('system', '工具栏测试组件已加载')
+  
+  // 自动设置示例内容
+  setTimeout(() => {
+    setSampleContent()
+  }, 500)
 })
 </script>
 

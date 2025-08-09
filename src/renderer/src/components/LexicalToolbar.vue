@@ -196,9 +196,12 @@ const isListActive = (listType: 'bullet' | 'number') => {
 
 // 格式化文本
 const handleFormatText = (format: TextFormatType) => {
-  if (!props.editor) return
+  if (!props.editor) {
+    console.warn('Editor not available for formatting')
+    return
+  }
   
-  console.log(`Formatting text: ${format}`)
+  console.log(`Formatting text: ${format}`, 'Editor:', props.editor)
   formatText(props.editor, format)
 }
 

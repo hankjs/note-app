@@ -82,7 +82,27 @@ window.lexicalTest = {
   focus: () => {
     editor.focus()
     console.log('Editor focused')
-  }
+  },
+  // 添加命令分发方法
+  dispatchCommand: (command: any, payload?: any) => {
+    try {
+      console.log('Dispatching command:', command, 'payload:', payload)
+      return editor.dispatchCommand(command, payload)
+    } catch (error) {
+      console.error('Failed to dispatch command:', error)
+      return false
+    }
+  },
+  // 添加编辑器更新方法
+  update: (fn: () => void) => {
+    try {
+      return editor.update(fn)
+    } catch (error) {
+      console.error('Failed to update editor:', error)
+    }
+  },
+  // 获取编辑器实例
+  getEditor: () => editor
 }
 
 console.log('Lexical 编辑器已创建，可以使用以下命令测试：')
