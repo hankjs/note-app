@@ -4,7 +4,12 @@ import {
   FORMAT_TEXT_COMMAND,
   SELECTION_CHANGE_COMMAND,
   $getRoot,
-  ElementNode
+  ElementNode,
+  $createRangeSelection,
+  $setSelection,
+  TextNode,
+  $createTextNode,
+  $createParagraphNode
 } from 'lexical'
 import {
   $createHeadingNode,
@@ -282,4 +287,314 @@ export function registerSelectionListener(
       }
     })
   })
+}
+
+// ==================== 文本选择 API ====================
+
+export interface TextPosition {
+  offset: number
+  node?: TextNode
+}
+
+export interface TextRange {
+  start: TextPosition
+  end: TextPosition
+}
+
+// 获取当前选择的文本
+export function getSelectedText(editor: any): string {
+  if (!editor || !editor.getEditorState) {
+    return ''
+  }
+  
+  let selectedText = ''
+  
+  try {
+    editor.getEditorState().read(() => {
+      const selection = $getSelection()
+      if ($isRangeSelection(selection)) {
+        selectedText = selection.getTextContent()
+      }
+    })
+  } catch (error) {
+    console.error('Failed to get selected text:', error)
+  }
+  
+  return selectedText
+}
+
+// 根据文本内容选择文字
+export function selectTextByContent(editor: any, searchText: string, startIndex: number = 0): boolean {
+  if (!editor || !editor.update || !searchText) {
+    return false
+  }
+  
+  let success = false
+  
+  try {
+    editor.update(() => {
+      const root = $getRoot()
+      if (!root || !root.getTextContent) {
+        return
+      }
+      
+      const textContent = root.getTextContent()
+      const index = textContent.indexOf(searchText, startIndex)
+      
+      if (index !== -1) {
+        success = selectTextByRange(editor, index, index + searchText.length)
+      }
+    })
+  } catch (error) {
+    console.error('Failed to select text by content:', error)
+  }
+  
+  return success
+}
+
+// 根据字符范围选择文字
+export function selectTextByRange(editor: any, startOffset: number, endOffset: number): boolean {
+  let success = false
+  
+  editor.update(() => {
+    try {
+      const root = $getRoot()
+      const textNodes = getAllTextNodes(root)
+      
+      let currentOffset = 0
+      let startNode: TextNode | null = null
+      let endNode: TextNode | null = null
+      let startNodeOffset = 0
+      let endNodeOffset = 0
+      
+      // 找到开始和结束位置的节点
+      for (const textNode of textNodes) {
+        const nodeText = textNode.getTextContent()
+        const nodeLength = nodeText.length
+        
+        if (startNode === null && currentOffset + nodeLength > startOffset) {
+          startNode = textNode
+          startNodeOffset = startOffset - currentOffset
+        }
+        
+        if (endNode === null && currentOffset + nodeLength >= endOffset) {
+          endNode = textNode
+          endNodeOffset = endOffset - currentOffset
+          break
+        }
+        
+        currentOffset += nodeLength
+      }
+      
+      if (startNode && endNode) {
+        const selection = $createRangeSelection()
+        selection.anchor.set(startNode.getKey(), startNodeOffset, 'text')
+        selection.focus.set(endNode.getKey(), endNodeOffset, 'text')
+        $setSelection(selection)
+        success = true
+      }
+    } catch (error) {
+      console.error('Failed to select text by range:', error)
+    }
+  })
+  
+  return success
+}
+
+// 选择所有文本
+export function selectAllText(editor: any): void {
+  editor.update(() => {
+    const root = $getRoot()
+    const firstChild = root.getFirstChild()
+    const lastChild = root.getLastChild()
+    
+    if (firstChild && lastChild) {
+      const selection = $createRangeSelection()
+      selection.anchor.set(firstChild.getKey(), 0, 'element')
+      selection.focus.set(lastChild.getKey(), lastChild.getChildrenSize(), 'element')
+      $setSelection(selection)
+    }
+  })
+}
+
+// 清除选择
+export function clearSelection(editor: any): void {
+  editor.update(() => {
+    $setSelection(null)
+  })
+}
+
+// 获取所有文本节点
+function getAllTextNodes(node: any): TextNode[] {
+  const textNodes: TextNode[] = []
+  
+  function traverse(currentNode: any) {
+    if (currentNode.getType && currentNode.getType() === 'text') {
+      textNodes.push(currentNode as TextNode)
+    } else if (currentNode.getChildren) {
+      const children = currentNode.getChildren()
+      for (const child of children) {
+        traverse(child)
+      }
+    }
+  }
+  
+  traverse(node)
+  return textNodes
+}
+
+// ==================== 程序化工具栏操作 API ====================
+
+// 对选中文本应用格式
+export function applyFormatToSelection(editor: any, format: TextFormatType): boolean {
+  let success = false
+  
+  editor.update(() => {
+    const selection = $getSelection()
+    if ($isRangeSelection(selection) && !selection.isCollapsed()) {
+      formatText(editor, format)
+      success = true
+    }
+  })
+  
+  return success
+}
+
+// 对指定文本应用格式
+export function applyFormatToText(editor: any, searchText: string, format: TextFormatType): boolean {
+  const selected = selectTextByContent(editor, searchText)
+  if (selected) {
+    return applyFormatToSelection(editor, format)
+  }
+  return false
+}
+
+// 对指定范围应用格式
+export function applyFormatToRange(editor: any, startOffset: number, endOffset: number, format: TextFormatType): boolean {
+  const selected = selectTextByRange(editor, startOffset, endOffset)
+  if (selected) {
+    return applyFormatToSelection(editor, format)
+  }
+  return false
+}
+
+// 插入格式化文本
+export function insertFormattedText(editor: any, text: string, formats: TextFormatType[]): void {
+  editor.update(() => {
+    const selection = $getSelection()
+    if ($isRangeSelection(selection)) {
+      const textNode = $createTextNode(text)
+      
+      // 应用格式
+      formats.forEach(format => {
+        switch (format) {
+          case 'bold':
+            textNode.toggleFormat('bold')
+            break
+          case 'italic':
+            textNode.toggleFormat('italic')
+            break
+          case 'underline':
+            textNode.toggleFormat('underline')
+            break
+          case 'strikethrough':
+            textNode.toggleFormat('strikethrough')
+            break
+          case 'code':
+            textNode.toggleFormat('code')
+            break
+        }
+      })
+      
+      selection.insertNodes([textNode])
+    }
+  })
+}
+
+// ==================== 复合操作 API ====================
+
+// 查找并格式化所有匹配的文本
+export function findAndFormatText(editor: any, searchText: string, format: TextFormatType): number {
+  let count = 0
+  
+  editor.update(() => {
+    const root = $getRoot()
+    const fullText = root.getTextContent()
+    let searchIndex = 0
+    
+    while (true) {
+      const index = fullText.indexOf(searchText, searchIndex)
+      if (index === -1) break
+      
+      if (selectTextByRange(editor, index, index + searchText.length)) {
+        formatText(editor, format)
+        count++
+      }
+      
+      searchIndex = index + searchText.length
+    }
+  })
+  
+  return count
+}
+
+// 批量应用格式到多个文本
+export function batchFormatTexts(editor: any, textFormats: Array<{ text: string, formats: TextFormatType[] }>): number {
+  let successCount = 0
+  
+  textFormats.forEach(({ text, formats }) => {
+    formats.forEach(format => {
+      if (applyFormatToText(editor, text, format)) {
+        successCount++
+      }
+    })
+  })
+  
+  return successCount
+}
+
+// ==================== 工具栏状态 API ====================
+
+// 获取当前选择的详细信息
+export function getSelectionInfo(editor: any): {
+  hasSelection: boolean
+  selectedText: string
+  formats: Set<TextFormatType>
+  blockType: BlockType
+  selectionLength: number
+} {
+  const info = {
+    hasSelection: false,
+    selectedText: '',
+    formats: new Set<TextFormatType>(),
+    blockType: 'paragraph' as BlockType,
+    selectionLength: 0
+  }
+  
+  editor.getEditorState().read(() => {
+    const selection = $getSelection()
+    if ($isRangeSelection(selection)) {
+      info.hasSelection = !selection.isCollapsed()
+      info.selectedText = selection.getTextContent()
+      info.selectionLength = info.selectedText.length
+      info.formats = getSelectedTextFormats(editor)
+      info.blockType = getCurrentBlockType(editor)
+    }
+  })
+  
+  return info
+}
+
+// 检查是否可以应用格式
+export function canApplyFormat(editor: any, format: TextFormatType): boolean {
+  let canApply = false
+  
+  editor.getEditorState().read(() => {
+    const selection = $getSelection()
+    if ($isRangeSelection(selection) && !selection.isCollapsed()) {
+      canApply = true
+    }
+  })
+  
+  return canApply
 }

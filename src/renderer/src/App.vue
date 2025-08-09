@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import LexicalDebugTest from './components/LexicalDebugTest.vue'
+import LexicalApiTest from './components/LexicalApiTest.vue'
 </script>
 
 <template>
   <div class="app h-screen flex flex-col bg-white">
-    <!-- Lexical 工具栏调试测试 -->
-    <LexicalDebugTest />
+    <!-- Lexical 编辑器 API 测试 -->
+    <LexicalApiTest />
   </div>
 </template>
 
