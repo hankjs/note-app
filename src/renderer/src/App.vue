@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import LexicalApiTest from './components/LexicalApiTest.vue'
+import MainContent from './components/MainContent.vue'
+import Sidebar from './components/Sidebar.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
 </script>
 
@@ -8,8 +9,14 @@ import ThemeToggle from './components/ThemeToggle.vue'
     <!-- 主题切换按钮 -->
     <ThemeToggle />
     
-    <!-- Lexical 编辑器 API 测试 -->
-    <LexicalApiTest />
+    <!-- 主应用容器 -->
+    <div class="main-container flex-1 flex overflow-hidden">
+      <!-- 侧边栏 -->
+      <Sidebar />
+      
+      <!-- 主内容区域 -->
+      <MainContent />
+    </div>
   </div>
 </template>
 

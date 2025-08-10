@@ -2,13 +2,12 @@
 @import './lexical-editor.css';
 
 body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   overflow: hidden;
-  background-image: url('./wavy-lines.svg');
-  background-size: cover;
-  user-select: none;
 }
 
 code {
@@ -21,15 +20,12 @@ code {
 }
 
 #app {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
   width: 100%;
-  height: 100%;
-  margin-bottom: 80px;
+  height: 100vh;
+  overflow: hidden;
 }
 
+/* 保留一些通用样式 */
 .logo {
   margin-bottom: var(--spacing-2xl);
   -webkit-user-drag: none;
