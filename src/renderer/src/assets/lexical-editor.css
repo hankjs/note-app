@@ -448,25 +448,6 @@
   color: var(--lexical-text-primary);
 }
 
-.app .editor-container {
-  width: 100%;
-  min-height: 200px;
-  border: 2px solid var(--lexical-editor-border);
-  border-radius: var(--lexical-editor-radius);
-  padding: var(--lexical-spacing-lg);
-  background-color: var(--lexical-editor-bg);
-  font-family: var(--lexical-font-family);
-  line-height: 1.6;
-  outline: none;
-  transition: border-color var(--lexical-transition-normal), 
-              box-shadow var(--lexical-transition-normal);
-}
-
-.app .editor-container:focus {
-  border-color: var(--lexical-editor-border-focus);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
 /* 工具栏样式 */
 .app .lexical-toolbar {
   display: flex;

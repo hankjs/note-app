@@ -23,20 +23,13 @@ onMounted(() => {
     <!-- 主内容区域 -->
     <div class="content-area flex-1 overflow-y-auto p-4">
       <div class="h-full">
-        <div class="mb-4">
-          <h2 class="text-xl font-semibold text-gray-800 mb-2">富文本编辑器</h2>
-          <p class="text-gray-600 text-sm">在这里编写你的笔记内容</p>
-        </div>
-        
         <!-- 编辑器 -->
-        <div class="editor-container mb-4">
-          <LexicalEditorWithToolbar
-            v-model="content"
-            :show-toolbar="true"
-            :show-debug="false"
-            @change="handleChange"
-          />
-        </div>
+        <LexicalEditorWithToolbar
+          v-model="content"
+          :show-toolbar="true"
+          :show-debug="false"
+          @change="handleChange"
+        />
       </div>
     </div>
 
