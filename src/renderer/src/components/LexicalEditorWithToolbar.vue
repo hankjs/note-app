@@ -100,19 +100,11 @@ const updateEditorInstance = () => {
 onMounted(() => {
   // 延迟获取编辑器实例，确保子组件已经初始化
   setTimeout(() => {
-    updateEditorInstance()
-    // 定期检查编辑器实例是否更新
-    const interval = setInterval(() => {
-      if (!editor.value) {
-        updateEditorInstance()
-      } else {
-        clearInterval(interval)
-      }
-    }, 100)
-    
-    // 10秒后停止检查
-    setTimeout(() => clearInterval(interval), 10000)
-  }, 200)
+    if (editorRef.value?.editor) {
+      editor.value = editorRef.value.editor
+      console.log('LexicalEditorWithToolbar: 编辑器实例已从子组件获取', editor.value)
+    }
+  }, 300)
 })
 
 // 暴露方法给父组件

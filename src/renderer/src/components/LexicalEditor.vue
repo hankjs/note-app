@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
-import '@/utils/lexicalSimpleTest'
+import { useLexicalEditor } from '@/composables/useLexicalEditor'
 import type { LexicalEditorConfig } from '@/types/lexical'
 
 interface Props {
@@ -41,15 +41,23 @@ const emit = defineEmits<{
   'error': [error: Error]
 }>()
 
-// 编辑器容器引用
 const editorRef = ref<HTMLElement>()
 const content = ref(props.modelValue)
 const editorState = ref<any>(null)
 
+const { 
+  editor,
+  setRootElement,
+  updateContent: updateEditorContent,
+  focus: focusEditor,
+  onUpdate,
+  onError 
+} = useLexicalEditor(props.config)
+
 // 初始化编辑器
 const initEditor = () => {
   if (editorRef.value) {
-    (window as any).lexicalTest.setRootElement(editorRef.value)
+    setRootElement(editorRef.value)
     console.log('LexicalEditor: 编辑器已初始化')
     
     // 如果有初始内容，设置到编辑器
@@ -63,7 +71,7 @@ const initEditor = () => {
 
 // 更新内容
 const updateContent = (newContent: string) => {
-  (window as any).lexicalTest.updateContent(newContent)
+  updateEditorContent(newContent)
   content.value = newContent
   emit('update:modelValue', newContent)
   emit('change', newContent)
@@ -71,14 +79,14 @@ const updateContent = (newContent: string) => {
 
 // 获取状态
 const getState = () => {
-  const state = (window as any).lexicalTest.getState()
+  const state = editor.value?.getEditorState()?.toJSON()
   editorState.value = state
   return state
 }
 
 // 聚焦编辑器
 const focus = () => {
-  (window as any).lexicalTest.focus()
+  focusEditor()
   emit('focus')
 }
 
@@ -87,7 +95,7 @@ watch(() => props.modelValue, (newValue) => {
   if (newValue !== content.value) {
     updateContent(newValue)
   }
-}, { immediate: true })
+})
 
 // 组件挂载后初始化编辑器
 onMounted(() => {
@@ -97,6 +105,16 @@ onMounted(() => {
   setTimeout(() => {
     initEditor()
   }, 100)
+  
+  // 监听更新
+  onUpdate((state) => {
+    console.log('Editor updated:', state.toJSON())
+  })
+  
+  // 监听错误
+  onError((error) => {
+    emit('error', error)
+  })
 })
 
 // 组件卸载时清理
@@ -109,7 +127,8 @@ defineExpose({
   focus,
   updateContent,
   getState,
-  setRootElement: initEditor
+  setRootElement: initEditor,
+  editor
 })
 </script>
 

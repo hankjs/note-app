@@ -1,6 +1,5 @@
 import './assets/main.css'
 import 'uno.css'
-import './utils/lexicalSimpleTest'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
