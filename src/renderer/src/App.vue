@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import MainContent from './components/MainContent.vue'
-import Sidebar from './components/Sidebar.vue'
-import ThemeToggle from './components/ThemeToggle.vue'
+import MainContent from './components/layout/MainContent.vue'
+import Sidebar from './components/layout/Sidebar.vue'
+import ThemeToggle from './components/layout/ThemeToggle.vue'
 </script>
 
 <template>

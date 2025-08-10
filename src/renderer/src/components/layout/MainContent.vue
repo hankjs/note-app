@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import LexicalEditorWithToolbar from './LexicalEditorWithToolbar.vue'
+import LexicalEditorWithToolbar from '@/components/editor/LexicalEditorWithToolbar.vue'
 
 const content = ref(`欢迎使用笔记应用！
 
