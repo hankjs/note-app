@@ -13,6 +13,7 @@ import type {
   UseLexicalEditorReturn
 } from '@/types/lexical'
 import { editorStateToText, textToEditorState, createDefaultContent } from '@/utils/lexicalUtils'
+import { createLexicalTheme, getThemeState, watchThemeChange, applyThemeToEditor } from '@/utils/lexicalTheme'
 
 export function useLexicalEditor(config: Partial<LexicalEditorConfig> = {}): UseLexicalEditorReturn {
   // 响应式状态
@@ -43,13 +44,10 @@ export function useLexicalEditor(config: Partial<LexicalEditorConfig> = {}): Use
     const initialConfig = {
       namespace: defaultConfig.namespace,
       nodes: [HeadingNode, QuoteNode],
+      theme: createLexicalTheme(getThemeState()),
       onError: (error: Error) => {
         console.error('Lexical Editor Error:', error)
         errorCallbacks.value.forEach(callback => callback(error))
-      },
-      theme: {
-        // 添加主题配置
-        quote: 'PlaygroundEditorTheme__quote',
       },
     }
 
@@ -145,12 +143,19 @@ export function useLexicalEditor(config: Partial<LexicalEditorConfig> = {}): Use
     // 延迟创建编辑器，确保 DOM 已经准备好
     setTimeout(() => {
       createEditorInstance()
+      // 监听主题变化
+      const observer = watchThemeChange((isDark) => {
+        if (editor.value) {
+          applyThemeToEditor(editor.value, isDark)
+        }
+      })
     }, 100)
   })
 
   // 组件卸载时销毁编辑器
   onUnmounted(() => {
     destroy()
+    // 清理 observer 如果需要，但 watchThemeChange 返回 MutationObserver，可以 disconnect
   })
 
   return {
