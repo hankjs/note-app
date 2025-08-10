@@ -1,125 +1,177 @@
 import type { LexicalThemeConfig } from '@/types/lexical'
 
-// 默认主题配置
-export const defaultThemeConfig: LexicalThemeConfig = {
-  text: {
-    bold: 'font-bold',
-    italic: 'italic',
-    underline: 'underline',
-    strikethrough: 'line-through',
-    underlineStrikethrough: 'underline line-through',
-    code: 'bg-gray-100 px-1 py-0.5 rounded text-sm font-mono'
-  },
-  paragraph: 'mb-4 leading-relaxed',
-  heading: {
-    h1: 'text-3xl font-bold mb-4 mt-6',
-    h2: 'text-2xl font-bold mb-3 mt-5',
-    h3: 'text-xl font-bold mb-2 mt-4',
-    h4: 'text-lg font-bold mb-2 mt-3',
-    h5: 'text-base font-bold mb-1 mt-2',
-    h6: 'text-sm font-bold mb-1 mt-2'
-  },
-  list: {
-    ul: 'list-disc list-inside mb-4 space-y-1',
-    ol: 'list-decimal list-inside mb-4 space-y-1',
-    listitem: 'mb-1',
-    nested: {
-      listitem: 'ml-4'
-    }
-  },
-  quote: 'border-l-4 border-gray-300 pl-4 py-2 mb-4 italic text-gray-600',
-  code: 'bg-gray-900 text-gray-100 p-4 rounded-lg mb-4 font-mono text-sm overflow-x-auto',
-  table: 'border-collapse border border-gray-300 mb-4 w-full',
-  tableCell: 'border border-gray-300 px-3 py-2',
-  tableCellHeader: 'border border-gray-300 px-3 py-2 bg-gray-100 font-bold',
-  tableRow: 'hover:bg-gray-50',
-  link: 'text-blue-600 hover:text-blue-800 underline',
-  image: 'max-w-full h-auto rounded-lg mb-4'
-}
-
-// 暗色主题配置
-export const darkThemeConfig: LexicalThemeConfig = {
-  text: {
-    bold: 'font-bold',
-    italic: 'italic',
-    underline: 'underline',
-    strikethrough: 'line-through',
-    underlineStrikethrough: 'underline line-through',
-    code: 'bg-gray-700 px-1 py-0.5 rounded text-sm font-mono text-gray-200'
-  },
-  paragraph: 'mb-4 leading-relaxed text-gray-200',
-  heading: {
-    h1: 'text-3xl font-bold mb-4 mt-6 text-white',
-    h2: 'text-2xl font-bold mb-3 mt-5 text-white',
-    h3: 'text-xl font-bold mb-2 mt-4 text-white',
-    h4: 'text-lg font-bold mb-2 mt-3 text-white',
-    h5: 'text-base font-bold mb-1 mt-2 text-white',
-    h6: 'text-sm font-bold mb-1 mt-2 text-white'
-  },
-  list: {
-    ul: 'list-disc list-inside mb-4 space-y-1 text-gray-200',
-    ol: 'list-decimal list-inside mb-4 space-y-1 text-gray-200',
-    listitem: 'mb-1',
-    nested: {
-      listitem: 'ml-4'
-    }
-  },
-  quote: 'border-l-4 border-gray-600 pl-4 py-2 mb-4 italic text-gray-300',
-  code: 'bg-gray-800 text-gray-100 p-4 rounded-lg mb-4 font-mono text-sm overflow-x-auto',
-  table: 'border-collapse border border-gray-600 mb-4 w-full',
-  tableCell: 'border border-gray-600 px-3 py-2 text-gray-200',
-  tableCellHeader: 'border border-gray-600 px-3 py-2 bg-gray-700 font-bold text-white',
-  tableRow: 'hover:bg-gray-700',
-  link: 'text-blue-400 hover:text-blue-300 underline',
-  image: 'max-w-full h-auto rounded-lg mb-4'
-}
-
-// 将主题配置转换为 Lexical 编辑器主题
-export function createLexicalTheme(config: LexicalThemeConfig): any {
+// 完整的 Lexical 主题配置
+export const createLexicalTheme = (isDark: boolean = false) => {
   return {
-    text: {
-      bold: config.text.bold,
-      italic: config.text.italic,
-      underline: config.text.underline,
-      strikethrough: config.text.strikethrough,
-      underlineStrikethrough: config.text.underlineStrikethrough,
-      code: config.text.code
-    },
-    paragraph: config.paragraph,
+    // 基础布局
+    ltr: 'lexical-ltr',
+    rtl: 'lexical-rtl',
+    
+    // 段落
+    paragraph: 'lexical-paragraph',
+    
+    // 引用
+    quote: 'lexical-quote',
+    
+    // 标题
     heading: {
-      h1: config.heading.h1,
-      h2: config.heading.h2,
-      h3: config.heading.h3,
-      h4: config.heading.h4,
-      h5: config.heading.h5,
-      h6: config.heading.h6
+      h1: 'lexical-heading-h1',
+      h2: 'lexical-heading-h2',
+      h3: 'lexical-heading-h3',
+      h4: 'lexical-heading-h4',
+      h5: 'lexical-heading-h5',
+      h6: 'lexical-heading-h6',
     },
+    
+    // 列表
     list: {
-      ul: config.list.ul,
-      ol: config.list.ol,
-      listitem: config.list.listitem,
       nested: {
-        listitem: config.list.nested.listitem
-      }
+        listitem: 'lexical-nested-listitem',
+      },
+      ol: 'lexical-list-ol',
+      ul: 'lexical-list-ul',
+      listitem: 'lexical-listitem',
+      listitemChecked: 'lexical-listitem-checked',
+      listitemUnchecked: 'lexical-listitem-unchecked',
     },
-    quote: config.quote,
-    code: config.code,
-    table: config.table,
-    tableCell: config.tableCell,
-    tableCellHeader: config.tableCellHeader,
-    tableRow: config.tableRow,
-    link: config.link,
-    image: config.image
+    
+    // 标签
+    hashtag: 'lexical-hashtag',
+    
+    // 图片
+    image: 'lexical-image',
+    
+    // 链接
+    link: 'lexical-link',
+    
+    // 文本样式
+    text: {
+      bold: 'lexical-text-bold',
+      code: 'lexical-text-code',
+      italic: 'lexical-text-italic',
+      strikethrough: 'lexical-text-strikethrough',
+      subscript: 'lexical-text-subscript',
+      superscript: 'lexical-text-superscript',
+      underline: 'lexical-text-underline',
+      underlineStrikethrough: 'lexical-text-underline-strikethrough',
+    },
+    
+    // 代码块
+    code: 'lexical-code',
+    
+    // 代码高亮
+    codeHighlight: {
+      atrule: 'lexical-token-attr',
+      attr: 'lexical-token-attr',
+      boolean: 'lexical-token-property',
+      builtin: 'lexical-token-selector',
+      cdata: 'lexical-token-comment',
+      char: 'lexical-token-selector',
+      class: 'lexical-token-function',
+      'class-name': 'lexical-token-function',
+      comment: 'lexical-token-comment',
+      constant: 'lexical-token-property',
+      deleted: 'lexical-token-property',
+      doctype: 'lexical-token-comment',
+      entity: 'lexical-token-operator',
+      function: 'lexical-token-function',
+      important: 'lexical-token-variable',
+      inserted: 'lexical-token-selector',
+      keyword: 'lexical-token-attr',
+      namespace: 'lexical-token-variable',
+      number: 'lexical-token-property',
+      operator: 'lexical-token-operator',
+      prolog: 'lexical-token-comment',
+      property: 'lexical-token-property',
+      punctuation: 'lexical-token-punctuation',
+      regex: 'lexical-token-variable',
+      selector: 'lexical-token-selector',
+      string: 'lexical-token-selector',
+      symbol: 'lexical-token-property',
+      tag: 'lexical-token-property',
+      url: 'lexical-token-operator',
+      variable: 'lexical-token-variable',
+    },
+    
+    // 表格
+    table: 'lexical-table',
+    tableCell: 'lexical-table-cell',
+    tableCellHeader: 'lexical-table-cell-header',
+    tableRow: 'lexical-table-row',
+    
+    // 占位符
+    placeholder: 'lexical-placeholder',
+    
+    // 选择
+    selection: 'lexical-selection',
+    
+    // 光标
+    cursor: 'lexical-cursor',
+    
+    // 拖拽
+    drag: 'lexical-drag',
+    
+    // 焦点
+    focus: 'lexical-focus',
+    
+    // 错误
+    error: 'lexical-error',
+    
+    // 警告
+    warning: 'lexical-warning',
+    
+    // 成功
+    success: 'lexical-success',
+    
+    // 信息
+    info: 'lexical-info',
   }
 }
 
 // 获取当前主题配置
-export function getThemeConfig(isDark: boolean = false): LexicalThemeConfig {
-  return isDark ? darkThemeConfig : defaultThemeConfig
+export function getEditorTheme(isDark: boolean = false): any {
+  return createLexicalTheme(isDark)
 }
 
-// 创建编辑器主题
-export function getEditorTheme(isDark: boolean = false): any {
-  const config = getThemeConfig(isDark)
-  return createLexicalTheme(config)
+// 主题切换函数
+export function applyThemeToEditor(editor: any, isDark: boolean = false) {
+  if (editor && editor._config) {
+    const newTheme = createLexicalTheme(isDark)
+    editor._config.theme = newTheme
+    // 触发编辑器重新渲染
+    editor.update(() => {
+      // 强制更新
+    })
+  }
+}
+
+// 获取主题状态
+export function getThemeState(): boolean {
+  const app = document.querySelector('.app')
+  return app?.classList.contains('theme-dark') || false
+}
+
+// 监听主题变化
+export function watchThemeChange(callback: (isDark: boolean) => void) {
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+        const target = mutation.target as Element
+        if (target.classList.contains('app')) {
+          const isDark = target.classList.contains('theme-dark')
+          callback(isDark)
+        }
+      }
+    })
+  })
+  
+  const app = document.querySelector('.app')
+  if (app) {
+    observer.observe(app, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+  }
+  
+  return observer
 }
