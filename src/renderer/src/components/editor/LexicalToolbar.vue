@@ -83,7 +83,7 @@
         :class="['toolbar-btn', { active: isListActive('number') }]"
         title="有序列表"
       >
-        <ListNumberIcon class="w-4 h-4" />
+        <NumberedListIcon class="w-4 h-4" />
       </button>
     </div>
 
@@ -146,7 +146,9 @@ import {
   XMarkIcon,
   LinkIcon,
   ArrowUturnLeftIcon,
-  ArrowUturnRightIcon
+  ArrowUturnRightIcon,
+  StrikethroughIcon,
+  NumberedListIcon
 } from '@heroicons/vue/24/outline'
 
 import {
@@ -163,10 +165,6 @@ import {
   type TextFormatType,
   type BlockType
 } from '@/utils/lexicalCommands'
-
-// 自定义图标组件
-const StrikethroughIcon = { template: '<svg viewBox="0 0 20 20" fill="currentColor"><path d="M7.5 10h5m-8 0h1.5m9.5 0H17M6 6.5c0-1.5 1.5-3 4-3s4 1.5 4 3M6 13.5c0 1.5 1.5 3 4 3s4-1.5 4-3" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>' }
-const ListNumberIcon = { template: '<svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 4h1v3H3V4zM3 8h1v3H3V8zM3 12h1v3H3v-3zM7 5h10v1H7V5zM7 9h10v1H7V9zM7 13h10v1H7v-1z"/></svg>' }
 
 interface Props {
   editor?: any // LexicalEditor instance
