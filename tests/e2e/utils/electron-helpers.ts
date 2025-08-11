@@ -1,0 +1,266 @@
+import { Page, Locator, expect } from '@playwright/test';
+
+/**
+ * Electron-specific test helpers
+ * Uses electron-playwright-helpers for better Electron support
+ */
+
+/**
+ * 等待 Electron 应用完全加载
+ */
+export async function waitForElectronApp(page: Page): Promise<void> {
+  // 等待 Electron 特有的元素加载
+  await page.waitForLoadState('domcontentloaded');
+  
+  // 等待应用渲染完成
+  await page.waitForSelector('#app', { timeout: 10000 });
+  
+  // 等待 Vue 应用挂载
+  await page.waitForFunction(() => {
+    return document.querySelector('#app')?.children.length > 0;
+  }, { timeout: 10000 });
+}
+
+/**
+ * 检查是否在 Electron 环境中运行
+ */
+export async function isElectronEnvironment(page: Page): Promise<boolean> {
+  return await page.evaluate(() => {
+    return typeof window !== 'undefined' && 
+           (window.navigator.userAgent.includes('Electron') || 
+            (window as any).electronAPI !== undefined);
+  });
+}
+
+/**
+ * 等待 Lexical 编辑器在 Electron 中完全初始化
+ */
+export async function waitForElectronEditor(page: Page): Promise<Locator> {
+  // 等待编辑器容器 - 注意：contenteditable 在内部的 .editor-container 上
+  const editor = page.locator('.editor-container[contenteditable="true"]');
+  await editor.first().waitFor({ state: 'visible', timeout: 15000 });
+  
+  // 等待编辑器内容区域加载
+  await page.waitForFunction(() => {
+    const editorElement = document.querySelector('.editor-container[contenteditable="true"]');
+    return editorElement && editorElement.children.length > 0;
+  }, { timeout: 15000 });
+  
+  return editor.first();
+}
+
+/**
+ * 在 Electron 编辑器中输入文本
+ */
+export async function typeInElectronEditor(page: Page, text: string): Promise<void> {
+  const editor = await waitForElectronEditor(page);
+  
+  // 点击编辑器获取焦点
+  await editor.click();
+  
+  // 先清空编辑器内容（全选 + 删除）
+  await page.keyboard.press('Control+a');
+  await page.keyboard.press('Delete');
+  
+  // 等待清空完成
+  await page.waitForTimeout(100);
+  
+  // 使用 type 而不是 fill，因为 Lexical 编辑器需要事件触发
+  await editor.type(text);
+  
+  // 等待输入完成
+  await page.waitForTimeout(100);
+}
+
+/**
+ * 模拟 Electron 应用的键盘快捷键
+ */
+export async function simulateElectronShortcut(page: Page, shortcut: string): Promise<void> {
+  // Electron 在 macOS 上使用 Cmd，在其他平台使用 Ctrl
+  const isMac = process.platform === 'darwin';
+  const modifier = isMac ? 'Meta' : 'Control';
+  
+  switch (shortcut.toLowerCase()) {
+    case 'save':
+      await page.keyboard.press(`${modifier}+s`);
+      break;
+    case 'new':
+      await page.keyboard.press(`${modifier}+n`);
+      break;
+    case 'open':
+      await page.keyboard.press(`${modifier}+o`);
+      break;
+    case 'selectall':
+      await page.keyboard.press(`${modifier}+a`);
+      break;
+    case 'copy':
+      await page.keyboard.press(`${modifier}+c`);
+      break;
+    case 'paste':
+      await page.keyboard.press(`${modifier}+v`);
+      break;
+    case 'cut':
+      await page.keyboard.press(`${modifier}+x`);
+      break;
+    case 'undo':
+      await page.keyboard.press(`${modifier}+z`);
+      break;
+    case 'redo':
+      if (isMac) {
+        await page.keyboard.press(`${modifier}+Shift+z`);
+      } else {
+        await page.keyboard.press(`${modifier}+y`);
+      }
+      break;
+    case 'bold':
+      await page.keyboard.press(`${modifier}+b`);
+      break;
+    case 'italic':
+      await page.keyboard.press(`${modifier}+i`);
+      break;
+    default:
+      throw new Error(`Unknown shortcut: ${shortcut}`);
+  }
+  
+  // 等待快捷键操作完成
+  await page.waitForTimeout(200);
+}
+
+/**
+ * 检查 Electron 应用的主题状态
+ */
+export async function getElectronTheme(page: Page): Promise<string> {
+  return await page.evaluate(() => {
+    // 检查多种可能的主题属性
+    const html = document.documentElement;
+    const body = document.body;
+    
+    if (html.getAttribute('data-theme')) {
+      return html.getAttribute('data-theme') || 'light';
+    }
+    
+    if (html.classList.contains('dark')) {
+      return 'dark';
+    }
+    
+    if (body.classList.contains('dark')) {
+      return 'dark';
+    }
+    
+    // 检查 CSS 变量
+    const computedStyle = getComputedStyle(html);
+    const themeVar = computedStyle.getPropertyValue('--theme').trim();
+    if (themeVar) {
+      return themeVar;
+    }
+    
+    return 'light';
+  });
+}
+
+/**
+ * 切换 Electron 应用主题
+ */
+export async function toggleElectronTheme(page: Page): Promise<string> {
+  const initialTheme = await getElectronTheme(page);
+  
+  // 查找主题切换按钮
+  const themeToggle = page.locator('[data-testid="theme-toggle"], .theme-toggle, button[aria-label*="theme"], button[title*="theme"]');
+  
+  if (await themeToggle.count() > 0) {
+    await themeToggle.first().click();
+    
+    // 等待主题切换完成
+    await page.waitForTimeout(300);
+    
+    const newTheme = await getElectronTheme(page);
+    return newTheme;
+  }
+  
+  return initialTheme;
+}
+
+/**
+ * 等待 Electron 应用的文件操作完成
+ */
+export async function waitForElectronFileOperation(page: Page, operation: 'save' | 'load' | 'new'): Promise<void> {
+  // 等待文件操作相关的 UI 状态变化
+  switch (operation) {
+    case 'save':
+      // 等待保存完成指示器
+      await page.waitForSelector('[data-testid="save-indicator"], .save-indicator, .saved', { 
+        state: 'visible', 
+        timeout: 5000 
+      });
+      break;
+    case 'load':
+      // 等待文件加载完成
+      await page.waitForLoadState('networkidle', { timeout: 10000 });
+      break;
+    case 'new':
+      // 等待新文件创建完成
+      await page.waitForTimeout(1000);
+      break;
+  }
+}
+
+/**
+ * 检查 Electron 应用的响应式布局
+ */
+export async function testElectronResponsiveLayout(page: Page): Promise<void> {
+  const viewports = [
+    { width: 1280, height: 720 },   // 桌面
+    { width: 1024, height: 768 },   // 小桌面
+    { width: 800, height: 600 },    // 平板
+    { width: 375, height: 667 },    // 手机
+  ];
+  
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport);
+    await page.waitForTimeout(500);
+    
+    // 检查应用是否仍然可用
+    await expect(page.locator('body')).toBeVisible();
+    
+    // 检查主要元素是否可见
+    const mainContent = page.locator('[data-testid="main-content"], .main-content, main, #app');
+    if (await mainContent.count() > 0) {
+      await expect(mainContent.first()).toBeVisible();
+    }
+  }
+  
+  // 恢复默认尺寸
+  await page.setViewportSize({ width: 1280, height: 720 });
+}
+
+/**
+ * 获取 Electron 应用的控制台日志
+ */
+export async function getElectronConsoleLogs(page: Page): Promise<string[]> {
+  const logs: string[] = [];
+  
+  page.on('console', msg => {
+    logs.push(`${msg.type()}: ${msg.text()}`);
+  });
+  
+  return logs;
+}
+
+/**
+ * 检查 Electron 应用是否有错误
+ */
+export async function checkElectronErrors(page: Page): Promise<string[]> {
+  const errors: string[] = [];
+  
+  page.on('console', msg => {
+    if (msg.type() === 'error') {
+      errors.push(msg.text());
+    }
+  });
+  
+  page.on('pageerror', error => {
+    errors.push(error.message);
+  });
+  
+  return errors;
+}
