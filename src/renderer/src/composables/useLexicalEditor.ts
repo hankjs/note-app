@@ -15,7 +15,7 @@ import type {
   UseLexicalEditorReturn
 } from '@/types/lexical'
 import { editorStateToText, textToEditorState, createDefaultContent } from '@/utils/lexicalUtils'
-import { createLexicalTheme, getThemeState, watchThemeChange, applyThemeToEditor } from '@/utils/lexicalTheme'
+import { createLexicalTheme, watchThemeChange, applyThemeToEditor } from '@/utils/lexicalTheme'
 
 export function useLexicalEditor(config: Partial<LexicalEditorConfig> = {}): UseLexicalEditorReturn {
   // 响应式状态
@@ -46,7 +46,7 @@ export function useLexicalEditor(config: Partial<LexicalEditorConfig> = {}): Use
     const initialConfig = {
       namespace: defaultConfig.namespace,
       nodes: [HeadingNode, QuoteNode, CodeNode, CodeHighlightNode],
-      theme: createLexicalTheme(getThemeState()),
+      theme: createLexicalTheme(),
       onError: (error: Error) => {
         console.error('Lexical Editor Error:', error)
         errorCallbacks.value.forEach(callback => callback(error))
@@ -147,9 +147,9 @@ export function useLexicalEditor(config: Partial<LexicalEditorConfig> = {}): Use
     setTimeout(() => {
       createEditorInstance()
       // 监听主题变化
-      const observer = watchThemeChange((isDark) => {
+      watchThemeChange(() => {
         if (editor.value) {
-          applyThemeToEditor(editor.value, isDark)
+          applyThemeToEditor(editor.value)
         }
       })
     }, 100)

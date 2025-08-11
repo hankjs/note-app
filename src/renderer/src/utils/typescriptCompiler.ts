@@ -18,7 +18,7 @@ export interface CompileOptions {
 
 class TypeScriptCompiler {
   private defaultOptions: CompileOptions = {
-    target: ts.ScriptTarget.ES2020,
+    target: ts.ScriptTarget.ESNext,
     module: ts.ModuleKind.None,
     strict: false,
     esModuleInterop: true,
@@ -31,7 +31,7 @@ class TypeScriptCompiler {
    */
   compile(code: string, options: CompileOptions = {}): CompileResult {
     const compilerOptions: ts.CompilerOptions = {
-      target: ts.ScriptTarget.ES2020,
+      target: ts.ScriptTarget.ESNext,
       module: ts.ModuleKind.None,
       strict: false,
       esModuleInterop: true,
@@ -98,12 +98,8 @@ class TypeScriptCompiler {
    */
   checkSyntax(code: string, options: CompileOptions = {}): CompileResult {
     const compilerOptions: ts.CompilerOptions = {
-      target: options.target || this.defaultOptions.target,
-      module: options.module || this.defaultOptions.module,
-      strict: options.strict ?? this.defaultOptions.strict,
-      esModuleInterop: options.esModuleInterop ?? this.defaultOptions.esModuleInterop,
-      allowSyntheticDefaultImports: options.allowSyntheticDefaultImports ?? this.defaultOptions.allowSyntheticDefaultImports,
-      skipLibCheck: options.skipLibCheck ?? this.defaultOptions.skipLibCheck,
+      ...this.defaultOptions,
+      ...options,
       noEmit: true
     }
 
@@ -111,6 +107,7 @@ class TypeScriptCompiler {
       // 使用 transpileModule 进行语法检查，启用更严格的类型检查
       const result = ts.transpileModule(code, {
         compilerOptions: {
+          ...compilerOptions,
           target: ts.ScriptTarget.ESNext,
           module: ts.ModuleKind.None,
           lib: ['esnext'], // 使用 ESNext 库

@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { testCodeShikiIntegration, testCodeHighlighting } from '@/utils/lexicalCodeShikiTest'
 
 // 响应式状态

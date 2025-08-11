@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import LexicalEditor from './LexicalEditor.vue'
 import LexicalToolbar from './LexicalToolbar.vue'
 import type { LexicalEditorConfig } from '@/types/lexical'
@@ -80,21 +80,21 @@ watch(() => props.modelValue, (newValue) => {
 })
 
 // 获取编辑器实例
-const getEditorInstance = () => {
-  // 从全局对象获取编辑器实例
-  const globalEditor = (window as any).lexicalTest || (window as any).lexicalEditor
-  console.log('Getting editor instance:', globalEditor)
-  return globalEditor
-}
+// const getEditorInstance = () => {
+//   // 从全局对象获取编辑器实例
+//   const globalEditor = (window as any).lexicalTest || (window as any).lexicalEditor
+//   console.log('Getting editor instance:', globalEditor)
+//   return globalEditor
+// }
 
 // 编辑器实例变化监听
-const updateEditorInstance = () => {
-  const newEditor = getEditorInstance()
-  if (newEditor && newEditor !== editor.value) {
-    editor.value = newEditor
-    console.log('LexicalEditorWithToolbar: 编辑器实例已更新', editor.value)
-  }
-}
+// const updateEditorInstance = () => {
+//   const newEditor = getEditorInstance()
+//   if (newEditor && newEditor !== editor.value) {
+//     editor.value = newEditor
+//     console.log('LexicalEditorWithToolbar: 编辑器实例已更新', editor.value)
+//   }
+// }
 
 // 组件挂载后获取编辑器实例
 onMounted(() => {

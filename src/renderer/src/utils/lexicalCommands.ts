@@ -2,14 +2,12 @@ import {
   $getSelection,
   $isRangeSelection,
   FORMAT_TEXT_COMMAND,
-  SELECTION_CHANGE_COMMAND,
   $getRoot,
   ElementNode,
   $createRangeSelection,
   $setSelection,
   TextNode,
-  $createTextNode,
-  $createParagraphNode
+  $createTextNode
 } from 'lexical'
 import {
   $createHeadingNode,
@@ -24,15 +22,9 @@ import {
 } from '@lexical/list'
 import { $createCodeNode } from '@lexical/code'
 import {
-  $createLinkNode,
   $isLinkNode,
   TOGGLE_LINK_COMMAND
 } from '@lexical/link'
-import {
-  $isAtNodeEnd,
-  $wrapNodes,
-  $isNodeSelection
-} from '@lexical/selection'
 
 // 文本格式常量
 export const TEXT_FORMAT_TYPES = {
@@ -76,7 +68,7 @@ export function formatText(editor: any, format: TextFormatType): void {
 }
 
 // 获取当前选择的格式
-export function getSelectedTextFormats(editor: any): Set<TextFormatType> {
+export function getSelectedTextFormats(): Set<TextFormatType> {
   const formats = new Set<TextFormatType>()
   
   const selection = $getSelection()
@@ -127,7 +119,7 @@ export function setBlockType(editor: any, blockType: BlockType): void {
           // 创建段落节点
           newElement = element.constructor.getType() === 'paragraph' 
             ? element 
-            : element.replace(element.constructor.create())
+            : element.replace(element.constructor.clone(element) as ElementNode)
           break
       }
 
@@ -205,7 +197,12 @@ export function isInList(editor: any): { isInList: boolean, listType?: 'bullet' 
           result.listType = currentNode.getListType() === 'bullet' ? 'bullet' : 'number'
           break
         }
-        currentNode = currentNode.getParent()
+        const parent = currentNode.getParent()
+        if (parent) {
+          currentNode = parent
+        } else {
+          break
+        }
       }
     }
   })
@@ -265,13 +262,13 @@ export function redo(editor: any): void {
 }
 
 // 检查是否可以撤销
-export function canUndo(editor: any): boolean {
+export function canUndo(): boolean {
   // TODO: 实现撤销状态检查
   return true
 }
 
 // 检查是否可以重做
-export function canRedo(editor: any): boolean {
+export function canRedo(): boolean {
   // TODO: 实现重做状态检查
   return true
 }
@@ -285,7 +282,7 @@ export function registerSelectionListener(
     editorState.read(() => {
       const selection = $getSelection()
       if ($isRangeSelection(selection)) {
-        const formats = getSelectedTextFormats(editor)
+        const formats = getSelectedTextFormats()
         const blockType = getCurrentBlockType(editor)
         callback(formats, blockType)
       }
@@ -415,7 +412,7 @@ export function selectAllText(editor: any): void {
     if (firstChild && lastChild) {
       const selection = $createRangeSelection()
       selection.anchor.set(firstChild.getKey(), 0, 'element')
-      selection.focus.set(lastChild.getKey(), lastChild.getChildrenSize(), 'element')
+      selection.focus.set(lastChild.getKey(), lastChild.getTextContentSize(), 'element')
       $setSelection(selection)
     }
   })
@@ -581,7 +578,7 @@ export function getSelectionInfo(editor: any): {
       info.hasSelection = !selection.isCollapsed()
       info.selectedText = selection.getTextContent()
       info.selectionLength = info.selectedText.length
-      info.formats = getSelectedTextFormats(editor)
+      info.formats = getSelectedTextFormats()
       info.blockType = getCurrentBlockType(editor)
     }
   })
@@ -590,7 +587,7 @@ export function getSelectionInfo(editor: any): {
 }
 
 // 检查是否可以应用格式
-export function canApplyFormat(editor: any, format: TextFormatType): boolean {
+export function canApplyFormat(editor: any): boolean {
   let canApply = false
   
   editor.getEditorState().read(() => {

@@ -1,7 +1,5 @@
-import type { LexicalThemeConfig } from '@/types/lexical'
-
 // 完整的 Lexical 主题配置
-export const createLexicalTheme = (isDark: boolean = false) => {
+export const createLexicalTheme = () => {
   return {
     // 基础布局
     ltr: 'lexical-ltr',
@@ -129,14 +127,14 @@ export const createLexicalTheme = (isDark: boolean = false) => {
 }
 
 // 获取当前主题配置
-export function getEditorTheme(isDark: boolean = false): any {
-  return createLexicalTheme(isDark)
+export function getEditorTheme(): any {
+  return createLexicalTheme()
 }
 
 // 主题切换函数
-export function applyThemeToEditor(editor: any, isDark: boolean = false) {
+export function applyThemeToEditor(editor: any) {
   if (editor && editor._config) {
-    const newTheme = createLexicalTheme(isDark)
+    const newTheme = createLexicalTheme()
     editor._config.theme = newTheme
     // 触发编辑器重新渲染
     editor.update(() => {
