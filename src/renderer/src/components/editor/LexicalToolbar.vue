@@ -62,6 +62,7 @@
         <option value="h5">标题 5</option>
         <option value="h6">标题 6</option>
         <option value="quote">引用</option>
+        <option value="code">代码块</option>
       </select>
     </div>
 

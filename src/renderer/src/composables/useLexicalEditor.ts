@@ -5,6 +5,8 @@ import {
   EditorState
 } from 'lexical'
 import { registerRichText, HeadingNode, QuoteNode } from '@lexical/rich-text'
+import { CodeNode, CodeHighlightNode } from '@lexical/code'
+import { registerCodeHighlighting } from '@lexical/code-shiki'
 import { registerHistory, createEmptyHistoryState } from '@lexical/history'
 import { mergeRegister } from '@lexical/utils'
 
@@ -43,7 +45,7 @@ export function useLexicalEditor(config: Partial<LexicalEditorConfig> = {}): Use
     // 创建编辑器配置
     const initialConfig = {
       namespace: defaultConfig.namespace,
-      nodes: [HeadingNode, QuoteNode],
+      nodes: [HeadingNode, QuoteNode, CodeNode, CodeHighlightNode],
       theme: createLexicalTheme(getThemeState()),
       onError: (error: Error) => {
         console.error('Lexical Editor Error:', error)
@@ -57,7 +59,8 @@ export function useLexicalEditor(config: Partial<LexicalEditorConfig> = {}): Use
     // 注册插件
     mergeRegister(
       registerRichText(newEditor),
-      registerHistory(newEditor, createEmptyHistoryState(), 300)
+      registerHistory(newEditor, createEmptyHistoryState(), 300),
+      registerCodeHighlighting(newEditor)
     )
 
     // 监听编辑器更新

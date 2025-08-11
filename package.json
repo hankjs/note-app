@@ -35,6 +35,7 @@
     "@heroicons/vue": "^2.2.0",
     "@lexical/clipboard": "^0.34.0",
     "@lexical/code": "^0.34.0",
+    "@lexical/code-shiki": "^0.34.0",
     "@lexical/file": "^0.34.0",
     "@lexical/history": "^0.34.0",
     "@lexical/html": "^0.34.0",

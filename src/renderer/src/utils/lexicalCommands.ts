@@ -22,6 +22,7 @@ import {
   REMOVE_LIST_COMMAND,
   $isListNode
 } from '@lexical/list'
+import { $createCodeNode } from '@lexical/code'
 import {
   $createLinkNode,
   $isLinkNode,
@@ -117,6 +118,9 @@ export function setBlockType(editor: any, blockType: BlockType): void {
           break
         case 'quote':
           newElement = $createQuoteNode()
+          break
+        case 'code':
+          newElement = $createCodeNode()
           break
         case 'paragraph':
         default:
