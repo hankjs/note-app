@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { waitForElectronApp, waitForElectronEditor } from './utils/electron-helpers';
+import { waitForElectronApp, waitForElectronEditor, typeInElectronEditor } from './utils/electron-helpers';
 
 test.describe('Simple Backspace Test', () => {
   test.beforeEach(async ({ page }) => {
@@ -66,30 +66,13 @@ test.describe('Simple Backspace Test', () => {
     const innerHTML = await editorElement.innerHTML();
     console.log('Editor innerHTML:', innerHTML);
     
-    // 使用 Lexical 编辑器的 API 获取内容
-    const originalContent = await page.evaluate(() => {
-      const editorElement = document.querySelector('.editor-container[contenteditable="true"]');
-      if (editorElement && (editorElement as any).lexicalEditor) {
-        try {
-          const editor = (editorElement as any).lexicalEditor;
-          const state = editor.getEditorState();
-          const selection = state._selection;
-          console.log('Original selection:', selection);
-          return editor.getEditorState().read(() => {
-            return editor.getEditorState().toJSON();
-          });
-        } catch (error) {
-          console.log('Error reading editor state:', error);
-          return null;
-        }
-      }
-      return null;
-    });
-    console.log('Original Lexical content:', originalContent);
+    // 获取原始内容 - 使用用户级别的方式
+    const originalContent = await editor.textContent();
+    console.log('Original content:', originalContent);
     
-    // 输入一些文本 - 使用 page.keyboard.type 确保事件正确触发
+    // 使用專門的 Electron 編輯器輸入函數
     console.log('Starting to type text...');
-    await page.keyboard.type('TEST');
+    await typeInElectronEditor(page, 'TEST');
     console.log('Finished typing text');
     
     // 等待输入完成
@@ -99,30 +82,13 @@ test.describe('Simple Backspace Test', () => {
     const newInnerHTML = await editorElement.innerHTML();
     console.log('Editor innerHTML after typing:', newInnerHTML);
     
-    // 使用 Lexical 编辑器的 API 获取新内容
-    const newContent = await page.evaluate(() => {
-      const editorElement = document.querySelector('.editor-container[contenteditable="true"]');
-      if (editorElement && (editorElement as any).lexicalEditor) {
-        try {
-          const editor = (editorElement as any).lexicalEditor;
-          const state = editor.getEditorState();
-          const selection = state._selection;
-          console.log('New selection:', selection);
-          return editor.getEditorState().read(() => {
-            return editor.getEditorState().toJSON();
-          });
-        } catch (error) {
-          console.log('Error reading editor state:', error);
-          return null;
-        }
-      }
-      return null;
-    });
-    console.log('New Lexical content:', newContent);
+    // 获取新内容 - 使用用户级别的方式
+    const newContent = await editor.textContent();
+    console.log('New content:', newContent);
     
     // 验证文本输入是否正常
     expect(newContent).not.toBeNull();
-    expect(JSON.stringify(newContent)).toContain('TEST');
+    expect(newContent).toContain('TEST');
   });
 
   test('should handle text replacement', async ({ page }) => {
@@ -134,13 +100,20 @@ test.describe('Simple Backspace Test', () => {
     // 等待一下确保编辑器完全加载
     await page.waitForTimeout(1000);
     
+    // 先輸入一些初始文本
+    await typeInElectronEditor(page, 'INITIAL TEXT');
+    
+    // 驗證初始文本已輸入
+    let currentContent = await editor.textContent();
+    console.log('Initial content:', currentContent);
+    
     // 全选现有内容
     await page.keyboard.press('Control+a');
     
     // 等待选择完成
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(300);
     
-    // 输入新文本（这会替换选中的内容）- 使用 page.keyboard.type 确保事件正确触发
+    // 输入新文本（这会替换选中的内容）
     await page.keyboard.type('NEW CONTENT');
     
     // 等待输入完成
@@ -154,8 +127,7 @@ test.describe('Simple Backspace Test', () => {
     // 验证内容是否被正确替换
     expect(newContent).toContain('NEW CONTENT');
     
-    // 检查是否还包含原始内容
-    const hasOriginalContent = newContent?.includes('欢迎使用笔记应用');
-    console.log('Still has original content:', hasOriginalContent);
+    // 检查是否還包含初始文本（應該被替換掉）
+    expect(newContent).not.toContain('INITIAL TEXT');
   });
 });
