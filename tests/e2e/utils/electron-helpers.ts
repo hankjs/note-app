@@ -264,3 +264,94 @@ export async function checkElectronErrors(page: Page): Promise<string[]> {
   
   return errors;
 }
+
+/**
+ * 测试退格键功能
+ */
+export async function testBackspaceKey(page: Page, text: string, deleteCount: number): Promise<void> {
+  const editor = await waitForElectronEditor(page);
+  
+  // 输入文本
+  await typeInElectronEditor(page, text);
+  
+  // 验证文本已输入
+  await expect(editor).toContainText(text);
+  
+  // 将光标移动到文本末尾
+  await editor.click();
+  await page.keyboard.press('End');
+  
+  // 按退格键删除指定数量的字符
+  for (let i = 0; i < deleteCount; i++) {
+    await page.keyboard.press('Backspace');
+    await page.waitForTimeout(50); // 短暂等待确保删除操作完成
+  }
+  
+  // 验证删除结果
+  const expectedText = text.slice(0, -deleteCount);
+  if (expectedText) {
+    await expect(editor).toContainText(expectedText);
+  } else {
+    await expect(editor).toHaveText('');
+  }
+}
+
+/**
+ * 测试删除键功能
+ */
+export async function testDeleteKey(page: Page, text: string, deleteCount: number): Promise<void> {
+  const editor = await waitForElectronEditor(page);
+  
+  // 输入文本
+  await typeInElectronEditor(page, text);
+  
+  // 验证文本已输入
+  await expect(editor).toContainText(text);
+  
+  // 将光标移动到文本开头
+  await editor.click();
+  await page.keyboard.press('Home');
+  
+  // 按删除键删除指定数量的字符
+  for (let i = 0; i < deleteCount; i++) {
+    await page.keyboard.press('Delete');
+    await page.waitForTimeout(50); // 短暂等待确保删除操作完成
+  }
+  
+  // 验证删除结果
+  const expectedText = text.slice(deleteCount);
+  if (expectedText) {
+    await expect(editor).toContainText(expectedText);
+  } else {
+    await expect(editor).toHaveText('');
+  }
+}
+
+/**
+ * 测试光标移动和文本选择
+ */
+export async function testCursorMovement(page: Page, text: string): Promise<void> {
+  const editor = await waitForElectronEditor(page);
+  
+  // 输入文本
+  await typeInElectronEditor(page, text);
+  
+  // 测试光标移动到开头
+  await editor.click();
+  await page.keyboard.press('Home');
+  
+  // 测试光标移动到末尾
+  await page.keyboard.press('End');
+  
+  // 测试光标向左移动
+  await page.keyboard.press('ArrowLeft');
+  
+  // 测试光标向右移动
+  await page.keyboard.press('ArrowRight');
+  
+  // 测试全选
+  await simulateElectronShortcut(page, 'selectall');
+  
+  // 验证文本被选中
+  await expect(editor).toContainText(text);
+}

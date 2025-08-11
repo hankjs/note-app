@@ -97,25 +97,27 @@ watch(() => props.modelValue, (newValue) => {
   }
 })
 
-// 组件挂载后初始化编辑器
-onMounted(() => {
-  console.log('LexicalEditor: 组件已挂载')
-  
-  // 自动初始化编辑器
-  setTimeout(() => {
-    initEditor()
-  }, 100)
-  
-  // 监听更新
-  onUpdate((state) => {
-    console.log('Editor updated:', state.toJSON())
+  // 组件挂载后初始化编辑器
+  onMounted(() => {
+    console.log('LexicalEditor: 组件已挂载')
+    
+    // 自动初始化编辑器
+    setTimeout(() => {
+      initEditor()
+    }, 100)
+    
+    // 监听更新
+    onUpdate((state) => {
+      console.log('Editor updated:', state.toJSON())
+      // 同步内容状态
+      content.value = JSON.stringify(state.toJSON())
+    })
+    
+    // 监听错误
+    onError((error) => {
+      emit('error', error)
+    })
   })
-  
-  // 监听错误
-  onError((error) => {
-    emit('error', error)
-  })
-})
 
 // 组件卸载时清理
 onUnmounted(() => {

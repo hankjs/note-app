@@ -144,4 +144,71 @@ test.describe('Lexical Editor Electron E2E Tests', () => {
     // 验证文本被重做
     await expect(editor).toContainText('Modified text');
   });
+
+  test('should handle backspace key correctly', async ({ page }) => {
+    // 输入测试文本
+    await typeInElectronEditor(page, 'Hello World');
+    
+    // 验证文本已输入
+    const editor = await waitForElectronEditor(page);
+    await expect(editor).toContainText('Hello World');
+    
+    // 将光标移动到 "World" 前面
+    await editor.click();
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.press('ArrowLeft');
+    
+    // 按退格键删除 "World"
+    await page.keyboard.press('Backspace');
+    await page.keyboard.press('Backspace');
+    await page.keyboard.press('Backspace');
+    await page.keyboard.press('Backspace');
+    await page.keyboard.press('Backspace');
+    
+    // 验证 "World" 被删除，只剩下 "Hello "
+    await expect(editor).toContainText('Hello ');
+    await expect(editor).not.toContainText('World');
+    
+    // 继续输入新内容
+    await editor.type('Playwright');
+    
+    // 验证最终结果
+    await expect(editor).toContainText('Hello Playwright');
+  });
+
+  test('should handle delete key correctly', async ({ page }) => {
+    // 输入测试文本
+    await typeInElectronEditor(page, 'Testing Delete Key');
+    
+    // 验证文本已输入
+    const editor = await waitForElectronEditor(page);
+    await expect(editor).toContainText('Testing Delete Key');
+    
+    // 将光标移动到开头
+    await editor.click();
+    await page.keyboard.press('Home');
+    
+    // 按删除键删除 "Testing "
+    await page.keyboard.press('Delete');
+    await page.keyboard.press('Delete');
+    await page.keyboard.press('Delete');
+    await page.keyboard.press('Delete');
+    await page.keyboard.press('Delete');
+    await page.keyboard.press('Delete');
+    await page.keyboard.press('Delete');
+    await page.keyboard.press('Delete');
+    
+    // 验证 "Testing " 被删除，只剩下 "Delete Key"
+    await expect(editor).toContainText('Delete Key');
+    await expect(editor).not.toContainText('Testing');
+    
+    // 继续输入新内容
+    await editor.type('New ');
+    
+    // 验证最终结果
+    await expect(editor).toContainText('New Delete Key');
+  });
 });

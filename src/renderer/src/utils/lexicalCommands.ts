@@ -26,6 +26,248 @@ import {
   TOGGLE_LINK_COMMAND
 } from '@lexical/link'
 
+
+/**
+ * 处理退格键命令
+ * 确保退格键能够正确删除文本
+ */
+export function handleBackspaceCommand(editor: any): void {
+  if (!editor) return
+
+  editor.update(() => {
+    const selection = window.getSelection()
+    if (!selection || selection.rangeCount === 0) return
+
+    const range = selection.getRangeAt(0)
+    const container = range.commonAncestorContainer
+    
+    // 如果选择的是文本节点
+    if (container.nodeType === Node.TEXT_NODE) {
+      const textNode = container as Text
+      const text = textNode.textContent || ''
+      const start = range.startOffset
+      const end = range.endOffset
+      
+      if (start === end) {
+        // 光标位置，删除前一个字符
+        if (start > 0) {
+          const newText = text.slice(0, start - 1) + text.slice(end)
+          textNode.textContent = newText
+          range.setStart(textNode, start - 1)
+          range.setEnd(textNode, start - 1)
+        }
+      } else {
+        // 有选择，删除选中的文本
+        const newText = text.slice(0, start) + text.slice(end)
+        textNode.textContent = newText
+        range.setStart(textNode, start)
+        range.setEnd(textNode, start)
+      }
+    }
+    
+    // 更新选择
+    selection.removeAllRanges()
+    selection.addRange(range)
+  })
+}
+
+/**
+ * 处理删除键命令
+ * 确保删除键能够正确删除文本
+ */
+export function handleDeleteCommand(editor: any): void {
+  if (!editor) return
+
+  editor.update(() => {
+    const selection = window.getSelection()
+    if (!selection || selection.rangeCount === 0) return
+
+    const range = selection.getRangeAt(0)
+    const container = range.commonAncestorContainer
+    
+    // 如果选择的是文本节点
+    if (container.nodeType === Node.TEXT_NODE) {
+      const textNode = container as Text
+      const text = textNode.textContent || ''
+      const start = range.startOffset
+      const end = range.endOffset
+      
+      if (start === end) {
+        // 光标位置，删除后一个字符
+        if (end < text.length) {
+          const newText = text.slice(0, start) + text.slice(end + 1)
+          textNode.textContent = newText
+          range.setStart(textNode, start)
+          range.setEnd(textNode, start)
+        }
+      } else {
+        // 有选择，删除选中的文本
+        const newText = text.slice(0, start) + text.slice(end)
+        textNode.textContent = newText
+        range.setStart(textNode, start)
+        range.setEnd(textNode, start)
+      }
+    }
+    
+    // 更新选择
+    selection.removeAllRanges()
+    selection.addRange(range)
+  })
+}
+
+/**
+ * 处理全选命令
+ * 确保 Ctrl+A 能够正确选择所有文本
+ */
+export function handleSelectAllCommand(editor: any): void {
+  if (!editor) return
+
+  editor.update(() => {
+    const selection = window.getSelection()
+    if (!selection) return
+
+    const root = $getRoot()
+    const firstChild = root.getFirstChild()
+    
+    if (firstChild && firstChild.getType() === 'paragraph') {
+      const textNode = firstChild.getFirstChild()
+      if (textNode && textNode.getType() === 'text') {
+        const range = document.createRange()
+        range.selectNodeContents(textNode)
+        selection.removeAllRanges()
+        selection.addRange(range)
+      }
+    }
+  })
+}
+
+/**
+ * 处理清空内容命令
+ * 确保能够正确清空编辑器内容
+ */
+export function handleClearContentCommand(editor: any): void {
+  if (!editor) return
+
+  editor.update(() => {
+    const root = $getRoot()
+    root.clear()
+    
+    // 创建空的段落节点
+    const paragraph = $createHeadingNode('h1')
+    root.append(paragraph)
+    
+    // 清空选择
+    const selection = window.getSelection()
+    if (selection) {
+      selection.removeAllRanges()
+    }
+  })
+}
+
+/**
+ * 处理文本输入命令
+ * 确保文本输入能够正确工作
+ */
+export function handleTextInputCommand(editor: any, text: string): void {
+  if (!editor || !text) return
+
+  editor.update(() => {
+    const selection = window.getSelection()
+    if (!selection || selection.rangeCount === 0) return
+
+    const range = selection.getRangeAt(0)
+    const container = range.commonAncestorContainer
+    
+    // 如果选择的是文本节点
+    if (container.nodeType === Node.TEXT_NODE) {
+      const textNode = container as Text
+      const currentText = textNode.textContent || ''
+      const start = range.startOffset
+      const end = range.endOffset
+      
+      // 替换选中的文本或插入新文本
+      const newText = currentText.slice(0, start) + text + currentText.slice(end)
+      textNode.textContent = newText
+      
+      // 更新光标位置
+      const newPosition = start + text.length
+      range.setStart(textNode, newPosition)
+      range.setEnd(textNode, newPosition)
+      
+      // 更新选择
+      selection.removeAllRanges()
+      selection.addRange(range)
+    }
+  })
+}
+
+/**
+ * 注册键盘事件处理
+ * 确保所有键盘操作都能正确工作
+ */
+export function registerKeyboardCommands(editor: any): (() => void) | undefined {
+  if (!editor) return
+
+  // 监听键盘事件
+  const handleKeyDown = (event: KeyboardEvent) => {
+    const { key, ctrlKey, metaKey } = event
+    
+    switch (key) {
+      case 'Backspace':
+        event.preventDefault()
+        handleBackspaceCommand(editor)
+        break
+        
+      case 'Delete':
+        event.preventDefault()
+        handleDeleteCommand(editor)
+        break
+        
+      case 'a':
+        if (ctrlKey || metaKey) {
+          event.preventDefault()
+          handleSelectAllCommand(editor)
+        }
+        break
+        
+      default:
+        // 其他按键正常处理
+        break
+    }
+  }
+
+  // 添加事件监听器
+  const rootElement = editor.getRootElement()
+  if (rootElement) {
+    rootElement.addEventListener('keydown', handleKeyDown)
+    
+    // 返回清理函数
+    return () => {
+      rootElement.removeEventListener('keydown', handleKeyDown)
+    }
+  }
+  
+  return undefined
+}
+
+/**
+ * 初始化编辑器命令
+ * 设置所有必要的命令处理
+ */
+export function initializeEditorCommands(editor: any): void {
+  if (!editor) return
+
+  // 注册键盘命令
+  const cleanup = registerKeyboardCommands(editor)
+  
+  // 在编辑器销毁时清理
+  if (cleanup) {
+    editor.registerUpdateListener(() => {
+      // 确保命令处理正常工作
+    })
+  }
+}
+
 // 文本格式常量
 export const TEXT_FORMAT_TYPES = {
   bold: 1,

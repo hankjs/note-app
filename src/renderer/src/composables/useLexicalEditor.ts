@@ -2,12 +2,24 @@ import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { 
   createEditor, 
   LexicalEditor, 
-  EditorState
+  EditorState,
+  $getRoot,
+  $createParagraphNode,
+  $createTextNode,
+  $isRootNode,
+  $isParagraphNode,
+  $isTextNode
 } from 'lexical'
-import { registerRichText, HeadingNode, QuoteNode } from '@lexical/rich-text'
+import { 
+  HeadingNode, 
+  QuoteNode
+} from '@lexical/rich-text'
 import { CodeNode, CodeHighlightNode } from '@lexical/code'
 import { registerCodeHighlighting } from '@lexical/code-shiki'
 import { registerHistory, createEmptyHistoryState } from '@lexical/history'
+import { ListItemNode, ListNode } from '@lexical/list'
+import { LinkNode, AutoLinkNode } from '@lexical/link'
+import { TableNode, TableCellNode, TableRowNode } from '@lexical/table'
 import { mergeRegister } from '@lexical/utils'
 
 import type { 
@@ -16,6 +28,7 @@ import type {
 } from '@/types/lexical'
 import { editorStateToText, textToEditorState, createDefaultContent } from '@/utils/lexicalUtils'
 import { createLexicalTheme, watchThemeChange, applyThemeToEditor } from '@/utils/lexicalTheme'
+import { initializeEditorCommands } from '@/utils/lexicalCommands'
 
 export function useLexicalEditor(config: Partial<LexicalEditorConfig> = {}): UseLexicalEditorReturn {
   // 响应式状态
@@ -42,25 +55,29 @@ export function useLexicalEditor(config: Partial<LexicalEditorConfig> = {}): Use
       editor.value = null
     }
 
-    // 创建编辑器配置
+    // 创建编辑器配置 - 使用最简单的配置
     const initialConfig = {
       namespace: defaultConfig.namespace,
-      nodes: [HeadingNode, QuoteNode, CodeNode, CodeHighlightNode],
+      nodes: [
+        HeadingNode, 
+        QuoteNode, 
+        CodeNode, 
+        CodeHighlightNode
+      ],
       theme: createLexicalTheme(),
       onError: (error: Error) => {
         console.error('Lexical Editor Error:', error)
         errorCallbacks.value.forEach(callback => callback(error))
       },
+      editable: defaultConfig.editable,
     }
 
     // 创建编辑器
     const newEditor = createEditor(initialConfig)
 
-    // 注册插件
+    // 注册基本插件
     mergeRegister(
-      registerRichText(newEditor),
-      registerHistory(newEditor, createEmptyHistoryState(), 300),
-      registerCodeHighlighting(newEditor)
+      registerHistory(newEditor, createEmptyHistoryState(), 300)
     )
 
     // 监听编辑器更新

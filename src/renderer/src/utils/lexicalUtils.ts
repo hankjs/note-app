@@ -96,20 +96,26 @@ function extractTextFromListNode(node: any): string[] {
 
 // 将文本内容转换为编辑器状态
 export function textToEditorState(editor: any, text: string): void {
-  if (!editor || !text) return
+  if (!editor) return
 
   editor.update(() => {
     const root = $getRoot()
     root.clear()
     
-    try {
-      // 尝试解析为 Markdown
-      $convertFromMarkdownString(text)
-    } catch (error) {
-      // 如果解析失败，作为纯文本处理
+    if (text) {
+      try {
+        // 尝试解析为 Markdown
+        $convertFromMarkdownString(text)
+      } catch (error) {
+        // 如果解析失败，作为纯文本处理
+        const paragraph = $createParagraphNode()
+        const textNode = $createTextNode(text)
+        paragraph.append(textNode)
+        root.append(paragraph)
+      }
+    } else {
+      // 如果文本为空，创建空的段落
       const paragraph = $createParagraphNode()
-      const textNode = $createTextNode(text)
-      paragraph.append(textNode)
       root.append(paragraph)
     }
   })
@@ -123,7 +129,7 @@ export function createDefaultContent(editor: any): void {
     const root = $getRoot()
     if (root.getFirstChild() === null) {
       const paragraph = $createParagraphNode()
-      const text = $createTextNode('开始编辑...')
+      const text = $createTextNode('欢迎使用笔记应用！这是一个简单的富文本编辑器，你可以在这里编写笔记内容。使用工具栏来格式化你的文本，支持标题、粗体、斜体、链接等功能。')
       paragraph.append(text)
       root.append(paragraph)
     }
