@@ -2,11 +2,7 @@
 import { ref, onMounted } from 'vue'
 import LexicalEditorWithToolbar from '@/components/editor/LexicalEditorWithToolbar.vue'
 
-const content = ref(`欢迎使用笔记应用！
-
-这是一个简单的富文本编辑器，你可以在这里编写笔记内容。
-
-使用工具栏来格式化你的文本，支持标题、粗体、斜体、链接等功能。`)
+const content = ref('')
 
 const handleChange = (value: string) => {
   console.log('Content changed:', value.length, 'characters')

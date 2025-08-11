@@ -8,7 +8,9 @@ import {
   $createTextNode,
   $isRootNode,
   $isParagraphNode,
-  $isTextNode
+  $isTextNode,
+  TextNode,
+  ParagraphNode
 } from 'lexical'
 import { 
   HeadingNode, 
@@ -50,57 +52,88 @@ export function useLexicalEditor(config: Partial<LexicalEditorConfig> = {}): Use
 
   // 创建编辑器实例
   const createEditorInstance = () => {
+    console.log('useLexicalEditor: 开始创建编辑器实例')
+    
     if (editor.value) {
+      console.log('useLexicalEditor: 清理现有编辑器')
       // 清理现有编辑器
       editor.value = null
     }
 
-    // 创建编辑器配置 - 使用最简单的配置
-    const initialConfig = {
-      namespace: defaultConfig.namespace,
-      nodes: [
-        HeadingNode, 
-        QuoteNode, 
-        CodeNode, 
-        CodeHighlightNode
-      ],
-      theme: createLexicalTheme(),
-      onError: (error: Error) => {
-        console.error('Lexical Editor Error:', error)
-        errorCallbacks.value.forEach(callback => callback(error))
-      },
-      editable: defaultConfig.editable,
-    }
+    try {
+      // 创建编辑器配置 - 使用最简单的配置
+      const initialConfig = {
+        namespace: defaultConfig.namespace,
+        nodes: [
+          // 基本节点类型 - 这些是必需的
+          TextNode,
+          ParagraphNode,
+          HeadingNode, 
+          QuoteNode, 
+          CodeNode, 
+          CodeHighlightNode,
+          // 添加基本的文本和段落节点
+          ListNode,
+          ListItemNode,
+          LinkNode,
+          AutoLinkNode,
+          TableNode,
+          TableCellNode,
+          TableRowNode
+        ],
+        theme: createLexicalTheme(),
+        onError: (error: Error) => {
+          console.error('Lexical Editor Error:', error)
+          errorCallbacks.value.forEach(callback => callback(error))
+        },
+        editable: defaultConfig.editable,
+        // 添加选择插件配置
+        selection: {
+          anchor: { key: 'root', offset: 0, type: 'text' },
+          focus: { key: 'root', offset: 0, type: 'text' }
+        }
+      }
 
-    // 创建编辑器
-    const newEditor = createEditor(initialConfig)
+      console.log('useLexicalEditor: 编辑器配置:', initialConfig)
 
-    // 注册基本插件
-    mergeRegister(
-      registerHistory(newEditor, createEmptyHistoryState(), 300)
-    )
+      // 创建编辑器
+      const newEditor = createEditor(initialConfig)
+      console.log('useLexicalEditor: 编辑器实例创建成功')
 
-    // 监听编辑器更新
-    newEditor.registerUpdateListener(({ editorState: newEditorState }) => {
-      editorState.value = newEditorState
-      
-      // 使用工具函数转换编辑器状态为文本
-      content.value = editorStateToText(newEditorState)
-      
-      // 触发更新回调
-      updateCallbacks.value.forEach(callback => callback(newEditorState))
-    })
+      // 注册基本插件
+      mergeRegister(
+        registerHistory(newEditor, createEmptyHistoryState(), 300)
+      )
+      console.log('useLexicalEditor: 插件注册完成')
 
-    // 初始化内容
-    createDefaultContent(newEditor)
-
-    editor.value = newEditor
-
-    // 自动聚焦
-    if (defaultConfig.autoFocus) {
-      nextTick(() => {
-        newEditor.focus()
+      // 监听编辑器更新
+      newEditor.registerUpdateListener(({ editorState: newEditorState }) => {
+        console.log('useLexicalEditor: 编辑器状态更新')
+        editorState.value = newEditorState
+        
+        // 使用工具函数转换编辑器状态为文本
+        content.value = editorStateToText(newEditorState)
+        
+        // 触发更新回调
+        updateCallbacks.value.forEach(callback => callback(newEditorState))
       })
+
+      // 初始化内容
+      createDefaultContent(newEditor)
+      console.log('useLexicalEditor: 默认内容创建完成')
+
+      editor.value = newEditor
+
+      // 自动聚焦
+      if (defaultConfig.autoFocus) {
+        nextTick(() => {
+          newEditor.focus()
+        })
+      }
+      
+      console.log('useLexicalEditor: 编辑器实例创建完成')
+    } catch (error) {
+      console.error('useLexicalEditor: 创建编辑器实例失败:', error)
     }
   }
 
@@ -118,8 +151,90 @@ export function useLexicalEditor(config: Partial<LexicalEditorConfig> = {}): Use
 
   // 设置根元素
   const setRootElement = (element: HTMLElement) => {
-    if (!editor.value) return
-    editor.value.setRootElement(element)
+    // 如果编辑器实例不存在，先创建它
+    if (!editor.value) {
+      console.log('useLexicalEditor: 编辑器实例不存在，先创建编辑器')
+      createEditorInstance()
+      // 等待编辑器创建完成
+      setTimeout(() => {
+        if (editor.value) {
+          try {
+            console.log('useLexicalEditor: 设置根元素:', element)
+            editor.value.setRootElement(element)
+            console.log('useLexicalEditor: 根元素设置成功')
+            
+            // 强制重新绑定事件监听器
+            setTimeout(() => {
+              if (editor.value) {
+                try {
+                  // 尝试聚焦编辑器
+                  editor.value.focus()
+                  console.log('useLexicalEditor: 编辑器聚焦成功')
+                  
+                  // 强制重新绑定事件监听器
+                  editor.value.update(() => {
+                    console.log('useLexicalEditor: 强制更新编辑器状态')
+                  })
+                  
+                  // 验证编辑器可以接收输入
+                  console.log('useLexicalEditor: 验证编辑器状态...')
+                  const state = editor.value.getEditorState()
+                  console.log('useLexicalEditor: 编辑器状态:', state.toJSON())
+                  
+                  // 检查编辑器的选择状态
+                  const selection = state._selection
+                  console.log('useLexicalEditor: 编辑器选择状态:', selection)
+                  
+                  console.log('useLexicalEditor: 事件监听器重新绑定完成')
+                } catch (error) {
+                  console.error('useLexicalEditor: 编辑器验证失败:', error)
+                }
+              }
+            }, 100)
+          } catch (error) {
+            console.error('useLexicalEditor: 设置根元素失败:', error)
+          }
+        }
+      }, 100)
+      return
+    }
+    
+    try {
+      console.log('useLexicalEditor: 设置根元素:', element)
+      editor.value.setRootElement(element)
+      console.log('useLexicalEditor: 根元素设置成功')
+      
+      // 强制重新绑定事件监听器
+      setTimeout(() => {
+        if (editor.value) {
+          try {
+            // 尝试聚焦编辑器
+            editor.value.focus()
+            console.log('useLexicalEditor: 编辑器聚焦成功')
+            
+            // 强制重新绑定事件监听器
+            editor.value.update(() => {
+              console.log('useLexicalEditor: 强制更新编辑器状态')
+            })
+            
+            // 验证编辑器可以接收输入
+            console.log('useLexicalEditor: 验证编辑器状态...')
+            const state = editor.value.getEditorState()
+            console.log('useLexicalEditor: 编辑器状态:', state.toJSON())
+            
+            // 检查编辑器的选择状态
+            const selection = state._selection
+            console.log('useLexicalEditor: 编辑器选择状态:', selection)
+            
+            console.log('useLexicalEditor: 事件监听器重新绑定完成')
+          } catch (error) {
+            console.error('useLexicalEditor: 编辑器验证失败:', error)
+          }
+        }
+      }, 100)
+    } catch (error) {
+      console.error('useLexicalEditor: 设置根元素失败:', error)
+    }
   }
 
   // 聚焦编辑器
@@ -160,16 +275,13 @@ export function useLexicalEditor(config: Partial<LexicalEditorConfig> = {}): Use
 
   // 组件挂载时创建编辑器
   onMounted(() => {
-    // 延迟创建编辑器，确保 DOM 已经准备好
-    setTimeout(() => {
-      createEditorInstance()
-      // 监听主题变化
-      watchThemeChange(() => {
-        if (editor.value) {
-          applyThemeToEditor(editor.value)
-        }
-      })
-    }, 100)
+    // 编辑器现在会在 setRootElement 时创建，这里只监听主题变化
+    // 监听主题变化
+    watchThemeChange(() => {
+      if (editor.value) {
+        applyThemeToEditor(editor.value)
+      }
+    })
   })
 
   // 组件卸载时销毁编辑器

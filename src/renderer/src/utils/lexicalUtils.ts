@@ -96,29 +96,43 @@ function extractTextFromListNode(node: any): string[] {
 
 // 将文本内容转换为编辑器状态
 export function textToEditorState(editor: any, text: string): void {
-  if (!editor) return
+  if (!editor) {
+    console.error('textToEditorState: 编辑器实例不存在')
+    return
+  }
 
-  editor.update(() => {
-    const root = $getRoot()
-    root.clear()
-    
-    if (text) {
-      try {
-        // 尝试解析为 Markdown
-        $convertFromMarkdownString(text)
-      } catch (error) {
-        // 如果解析失败，作为纯文本处理
+  console.log('textToEditorState: 开始转换文本:', text)
+
+  try {
+    editor.update(() => {
+      const root = $getRoot()
+      root.clear()
+      
+      if (text) {
+        try {
+          console.log('textToEditorState: 尝试解析为 Markdown')
+          // 尝试解析为 Markdown
+          $convertFromMarkdownString(text)
+        } catch (error) {
+          console.log('textToEditorState: Markdown 解析失败，作为纯文本处理:', error)
+          // 如果解析失败，作为纯文本处理
+          const paragraph = $createParagraphNode()
+          const textNode = $createTextNode(text)
+          paragraph.append(textNode)
+          root.append(paragraph)
+        }
+      } else {
+        console.log('textToEditorState: 文本为空，创建空段落')
+        // 如果文本为空，创建空的段落
         const paragraph = $createParagraphNode()
-        const textNode = $createTextNode(text)
-        paragraph.append(textNode)
         root.append(paragraph)
       }
-    } else {
-      // 如果文本为空，创建空的段落
-      const paragraph = $createParagraphNode()
-      root.append(paragraph)
-    }
-  })
+    })
+    
+    console.log('textToEditorState: 文本转换完成')
+  } catch (error) {
+    console.error('textToEditorState: 转换失败:', error)
+  }
 }
 
 // 创建默认的编辑器内容
@@ -128,9 +142,8 @@ export function createDefaultContent(editor: any): void {
   editor.update(() => {
     const root = $getRoot()
     if (root.getFirstChild() === null) {
+      // 创建一个空的段落节点，不包含任何文本
       const paragraph = $createParagraphNode()
-      const text = $createTextNode('欢迎使用笔记应用！这是一个简单的富文本编辑器，你可以在这里编写笔记内容。使用工具栏来格式化你的文本，支持标题、粗体、斜体、链接等功能。')
-      paragraph.append(text)
       root.append(paragraph)
     }
   })

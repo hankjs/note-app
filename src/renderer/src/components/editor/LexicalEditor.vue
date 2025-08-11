@@ -19,6 +19,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useLexicalEditor } from '@/composables/useLexicalEditor'
+import { editorStateToText } from '@/utils/lexicalUtils'
 import type { LexicalEditorConfig } from '@/types/lexical'
 
 interface Props {
@@ -57,13 +58,12 @@ const {
 // 初始化编辑器
 const initEditor = () => {
   if (editorRef.value) {
-    setRootElement(editorRef.value)
-    console.log('LexicalEditor: 编辑器已初始化')
+    console.log('LexicalEditor: 开始初始化编辑器')
     
-    // 如果有初始内容，设置到编辑器
-    if (props.modelValue) {
-      updateContent(props.modelValue)
-    }
+    // 设置根元素 - useLexicalEditor 会处理编辑器的创建
+    setRootElement(editorRef.value)
+    
+    console.log('LexicalEditor: 编辑器初始化完成')
   } else {
     console.error('LexicalEditor: 编辑器元素未找到')
   }
@@ -104,13 +104,25 @@ watch(() => props.modelValue, (newValue) => {
     // 自动初始化编辑器
     setTimeout(() => {
       initEditor()
+      
+      // 将编辑器实例绑定到 DOM 元素上，方便测试访问
+      if (editor.value && editorRef.value) {
+        (editorRef.value as any).lexicalEditor = editor.value;
+        console.log('LexicalEditor: 编辑器实例已绑定到 DOM 元素')
+      }
     }, 100)
     
     // 监听更新
     onUpdate((state) => {
       console.log('Editor updated:', state.toJSON())
-      // 同步内容状态
-      content.value = JSON.stringify(state.toJSON())
+      // 使用工具函数提取文本内容，而不是 JSON 字符串
+      try {
+        const textContent = editorStateToText(state)
+        content.value = textContent
+        console.log('LexicalEditor: 内容已更新:', textContent)
+      } catch (error) {
+        console.error('LexicalEditor: 提取文本内容失败:', error)
+      }
     })
     
     // 监听错误

@@ -56,27 +56,73 @@ test.describe('Simple Backspace Test', () => {
     // 等待一下确保编辑器完全加载
     await page.waitForTimeout(1000);
     
-    // 记录原始内容长度
-    const originalContent = await editor.textContent();
-    const originalLength = originalContent?.length || 0;
+    // 检查编辑器的属性
+    const editorElement = await page.locator('.editor-container[contenteditable="true"]').first();
+    const isContentEditable = await editorElement.getAttribute('contenteditable');
+    const hasLexicalEditor = await editorElement.getAttribute('data-lexical-editor');
+    console.log('Editor attributes:', { isContentEditable, hasLexicalEditor });
     
-    // 输入一些文本
-    await editor.type('TEST');
+    // 检查编辑器的内部 HTML 结构
+    const innerHTML = await editorElement.innerHTML();
+    console.log('Editor innerHTML:', innerHTML);
+    
+    // 使用 Lexical 编辑器的 API 获取内容
+    const originalContent = await page.evaluate(() => {
+      const editorElement = document.querySelector('.editor-container[contenteditable="true"]');
+      if (editorElement && (editorElement as any).lexicalEditor) {
+        try {
+          const editor = (editorElement as any).lexicalEditor;
+          const state = editor.getEditorState();
+          const selection = state._selection;
+          console.log('Original selection:', selection);
+          return editor.getEditorState().read(() => {
+            return editor.getEditorState().toJSON();
+          });
+        } catch (error) {
+          console.log('Error reading editor state:', error);
+          return null;
+        }
+      }
+      return null;
+    });
+    console.log('Original Lexical content:', originalContent);
+    
+    // 输入一些文本 - 使用 page.keyboard.type 确保事件正确触发
+    console.log('Starting to type text...');
+    await page.keyboard.type('TEST');
+    console.log('Finished typing text');
     
     // 等待输入完成
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
     
-    // 检查内容是否增加
-    const newContent = await editor.textContent();
-    const newLength = newContent?.length || 0;
+    // 再次检查编辑器的内部 HTML 结构
+    const newInnerHTML = await editorElement.innerHTML();
+    console.log('Editor innerHTML after typing:', newInnerHTML);
     
-    console.log('Original length:', originalLength);
-    console.log('New length:', newLength);
-    console.log('Content added:', newContent?.includes('TEST'));
+    // 使用 Lexical 编辑器的 API 获取新内容
+    const newContent = await page.evaluate(() => {
+      const editorElement = document.querySelector('.editor-container[contenteditable="true"]');
+      if (editorElement && (editorElement as any).lexicalEditor) {
+        try {
+          const editor = (editorElement as any).lexicalEditor;
+          const state = editor.getEditorState();
+          const selection = state._selection;
+          console.log('New selection:', selection);
+          return editor.getEditorState().read(() => {
+            return editor.getEditorState().toJSON();
+          });
+        } catch (error) {
+          console.log('Error reading editor state:', error);
+          return null;
+        }
+      }
+      return null;
+    });
+    console.log('New Lexical content:', newContent);
     
     // 验证文本输入是否正常
-    expect(newLength).toBeGreaterThan(originalLength);
-    expect(newContent).toContain('TEST');
+    expect(newContent).not.toBeNull();
+    expect(JSON.stringify(newContent)).toContain('TEST');
   });
 
   test('should handle text replacement', async ({ page }) => {
@@ -94,8 +140,8 @@ test.describe('Simple Backspace Test', () => {
     // 等待选择完成
     await page.waitForTimeout(500);
     
-    // 输入新文本（这会替换选中的内容）
-    await editor.type('NEW CONTENT');
+    // 输入新文本（这会替换选中的内容）- 使用 page.keyboard.type 确保事件正确触发
+    await page.keyboard.type('NEW CONTENT');
     
     // 等待输入完成
     await page.waitForTimeout(500);

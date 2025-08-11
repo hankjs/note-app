@@ -17,7 +17,8 @@ export async function waitForElectronApp(page: Page): Promise<void> {
   
   // 等待 Vue 应用挂载
   await page.waitForFunction(() => {
-    return document.querySelector('#app')?.children.length > 0;
+    const appElement = document.querySelector('#app');
+    return appElement && appElement.children.length > 0;
   }, { timeout: 10000 });
 }
 
@@ -36,15 +37,38 @@ export async function isElectronEnvironment(page: Page): Promise<boolean> {
  * 等待 Lexical 编辑器在 Electron 中完全初始化
  */
 export async function waitForElectronEditor(page: Page): Promise<Locator> {
+  console.log('waitForElectronEditor: 开始等待编辑器')
+  
   // 等待编辑器容器 - 注意：contenteditable 在内部的 .editor-container 上
   const editor = page.locator('.editor-container[contenteditable="true"]');
   await editor.first().waitFor({ state: 'visible', timeout: 15000 });
+  
+  console.log('waitForElectronEditor: 编辑器容器可见')
   
   // 等待编辑器内容区域加载
   await page.waitForFunction(() => {
     const editorElement = document.querySelector('.editor-container[contenteditable="true"]');
     return editorElement && editorElement.children.length > 0;
   }, { timeout: 15000 });
+  
+  console.log('waitForElectronEditor: 编辑器内容区域已加载')
+  
+  // 额外等待确保编辑器完全初始化
+  await page.waitForTimeout(1000);
+  
+  // 验证编辑器可以接受输入
+  await page.waitForFunction(() => {
+    const editorElement = document.querySelector('.editor-container[contenteditable="true"]');
+    if (!editorElement) return false;
+    
+    // 检查编辑器是否有正确的属性
+    const isContentEditable = editorElement.getAttribute('contenteditable') === 'true';
+    const hasLexicalEditor = editorElement.hasAttribute('data-lexical-editor');
+    
+    return isContentEditable && hasLexicalEditor;
+  }, { timeout: 10000 });
+  
+  console.log('waitForElectronEditor: 编辑器完全初始化，可以接受输入')
   
   return editor.first();
 }
@@ -58,18 +82,30 @@ export async function typeInElectronEditor(page: Page, text: string): Promise<vo
   // 点击编辑器获取焦点
   await editor.click();
   
+  // 等待编辑器完全加载
+  await page.waitForTimeout(500);
+  
   // 先清空编辑器内容（全选 + 删除）
   await page.keyboard.press('Control+a');
+  await page.waitForTimeout(100);
   await page.keyboard.press('Delete');
   
   // 等待清空完成
-  await page.waitForTimeout(100);
+  await page.waitForTimeout(200);
   
-  // 使用 type 而不是 fill，因为 Lexical 编辑器需要事件触发
-  await editor.type(text);
+  // 验证编辑器已清空
+  const emptyContent = await editor.textContent();
+  console.log('Editor content after clearing:', emptyContent);
+  
+  // 使用 page.keyboard.type 而不是 editor.type，确保 Lexical 编辑器正确接收事件
+  await page.keyboard.type(text);
   
   // 等待输入完成
-  await page.waitForTimeout(100);
+  await page.waitForTimeout(200);
+  
+  // 验证文本已输入
+  const finalContent = await editor.textContent();
+  console.log('Editor content after typing:', finalContent);
 }
 
 /**
