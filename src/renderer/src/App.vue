@@ -2,10 +2,14 @@
 import MainContent from './components/layout/MainContent.vue'
 import Sidebar from './components/layout/Sidebar.vue'
 import ThemeToggle from './components/layout/ThemeToggle.vue'
+import LexicalEditor from './components/editor/LexicalEditor.vue'
 </script>
 
 <template>
   <div class="app h-screen flex flex-col bg-white">
+    <LexicalEditor />
+
+    <template v-if="false">
     <!-- 主题切换按钮 -->
     <ThemeToggle />
     
@@ -17,6 +21,7 @@ import ThemeToggle from './components/layout/ThemeToggle.vue'
       <!-- 主内容区域 -->
       <MainContent />
     </div>
+    </template>
   </div>
 </template>
 
@@ -41,7 +46,7 @@ body {
   background-color: var(--color-background);
   color: var(--color-text);
   transition: background-color var(--transition-normal), 
-              color var(--transition-normal);
+  color var(--transition-normal);
 }
 
 .main-container {
