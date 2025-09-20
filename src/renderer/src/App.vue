@@ -2,12 +2,12 @@
 import MainContent from './components/layout/MainContent.vue'
 import Sidebar from './components/layout/Sidebar.vue'
 import ThemeToggle from './components/layout/ThemeToggle.vue'
-import LexicalEditor from './components/editor/LexicalEditor.vue'
+import Debugger from './components/debugger/Debugger.vue'
 </script>
 
 <template>
   <div class="app h-screen flex flex-col bg-white">
-    <LexicalEditor />
+    <Debugger />
 
     <template v-if="false">
     <!-- 主题切换按钮 -->

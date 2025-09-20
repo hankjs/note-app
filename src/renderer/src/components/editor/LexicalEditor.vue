@@ -18,7 +18,16 @@ import { ref, onMounted, onUnmounted, watch, nextTick, watchEffect, shallowRef }
 import type { LexicalEditorConfig } from '@/types/lexical'
 import { LexicalEditor } from 'lexical'
 import { createLexicalTheme } from '@renderer/utils/lexicalTheme'
-import { createEditor } from 'lexical';
+import { createEditor, HISTORY_MERGE_TAG } from 'lexical';
+import { useListeners } from './userListeners'
+import { LexicalEditorEvent } from './type'
+
+import { registerDragonSupport } from '@lexical/dragon';
+import { createEmptyHistoryState, registerHistory } from '@lexical/history';
+import { HeadingNode, QuoteNode, registerRichText } from '@lexical/rich-text';
+import { mergeRegister } from '@lexical/utils';
+
+import prepopulatedRichText from './prepopulatedRichText';
 
 interface Props {
   modelValue?: string
@@ -36,19 +45,15 @@ const props = withDefaults(defineProps<Props>(), {
   showDebug: false
 })
 
-const emit = defineEmits<{
-  'update:modelValue': [value: string]
-  'change': [value: string]
-  'focus': []
-  'blur': []
-  'error': [error: Error]
-}>()
+const emit = defineEmits<LexicalEditorEvent>()
 
-const editorRef = shallowRef<HTMLElement>()
+const editorRef = ref<HTMLElement>()
 const content = ref(props.modelValue)
 const editorState = ref<any>(null)
 
 const editor = ref<LexicalEditor | null>(null)
+
+const { registerListeners } = useListeners()
 
 // 初始化编辑器 - 参考标准 Lexical 模式
 const initEditor = async (el: HTMLElement) => {
@@ -59,32 +64,51 @@ const initEditor = async (el: HTMLElement) => {
 
   try {
     const config = {
-      namespace: 'MyEditor',
+      namespace: 'Hank Editor',
       theme: createLexicalTheme(),
-      onError: console.error
+      // Register nodes specific for @lexical/rich-text
+      nodes: [HeadingNode, QuoteNode],
+      onError: (error: Error) => {
+        console.error(error)
+
+      }
     };
 
-    editor.value = createEditor(config);
+    const instance = createEditor(config) as LexicalEditor;
+    editor.value = instance
     editor.value.setRootElement(el);
+
+    // Registering Plugins
+    mergeRegister(
+      registerRichText(instance),
+      registerDragonSupport(instance),
+      registerHistory(instance, createEmptyHistoryState(), 300),
+    );
+    registerListeners(instance as LexicalEditor)
+    emit('init', instance as LexicalEditor)
+
+    instance.update(prepopulatedRichText, { tag: HISTORY_MERGE_TAG });
+
   } catch (error) {
     console.error('LexicalEditor: 编辑器初始化失败:', error)
     emit('error', error as Error)
   }
 }
 
-watchEffect((onCleanUp) => {
-  debugger
-  if (editorRef.value) {
-    initEditor(editorRef.value)
+
+
+watch(() => editorRef.value, (newValue, oldValue) => {
+  console.log('LexicalEditor: 编辑器元素变化', newValue, oldValue)
+  if (newValue === oldValue) {
+    return
+  }
+  if (!newValue) {
     return
   }
 
-  onCleanUp(() => {
-    // 清理 DOM 元素上的引用
-    if (editorRef.value) {
-      delete (editorRef.value as any).lexicalEditor
-    }
-  })
+  initEditor(newValue)
+}, {
+  immediate: true
 })
 
 // 组件卸载时清理
@@ -97,10 +121,11 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style>
 /* 编辑器样式现在由 lexical-editor.css 提供 */
 /* 这里只保留组件特定的样式 */
 .lexical-editor {
+  user-select: text;
   position: relative;
   width: 100%;
   height: 100%;
@@ -113,11 +138,9 @@ onUnmounted(() => {
   border: 1px solid #ddd;
   border-radius: 4px;
   padding: 12px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 14px;
   line-height: 1.5;
   outline: none;
-  transition: border-color 0.2s ease;
 }
 
 .editor-container:focus {
