@@ -51,7 +51,7 @@ const editorRef = ref<HTMLElement>()
 const content = ref(props.modelValue)
 const editorState = ref<any>(null)
 
-const editor = ref<LexicalEditor | null>(null)
+const editorInstanceRef = shallowRef<LexicalEditor | null>(null)
 
 const { registerListeners } = useListeners()
 
@@ -75,8 +75,7 @@ const initEditor = async (el: HTMLElement) => {
     };
 
     const instance = createEditor(config) as LexicalEditor;
-    editor.value = instance
-    editor.value.setRootElement(el);
+    instance.setRootElement(el);
 
     // Registering Plugins
     mergeRegister(
@@ -85,10 +84,11 @@ const initEditor = async (el: HTMLElement) => {
       registerHistory(instance, createEmptyHistoryState(), 300),
     );
     registerListeners(instance as LexicalEditor)
-    emit('init', instance as LexicalEditor)
 
     instance.update(prepopulatedRichText, { tag: HISTORY_MERGE_TAG });
 
+    editorInstanceRef.value = instance
+    emit('init', instance as LexicalEditor)
   } catch (error) {
     console.error('LexicalEditor: 编辑器初始化失败:', error)
     emit('error', error as Error)
