@@ -27,6 +27,9 @@ import { createEmptyHistoryState, registerHistory } from '@lexical/history';
 import { HeadingNode, QuoteNode, registerRichText } from '@lexical/rich-text';
 import { mergeRegister } from '@lexical/utils';
 
+import {EmojiNode} from './emoji-plugin/EmojiNode';
+import {registerEmoji} from './emoji-plugin/EmojiPlugin';
+
 import prepopulatedRichText from './prepopulatedRichText';
 
 interface Props {
@@ -66,8 +69,7 @@ const initEditor = async (el: HTMLElement) => {
     const config = {
       namespace: 'Hank Editor',
       theme: createLexicalTheme(),
-      // Register nodes specific for @lexical/rich-text
-      nodes: [HeadingNode, QuoteNode],
+      nodes: [HeadingNode, QuoteNode, EmojiNode],
       onError: (error: Error) => {
         console.error(error)
 
@@ -82,6 +84,7 @@ const initEditor = async (el: HTMLElement) => {
       registerRichText(instance),
       registerDragonSupport(instance),
       registerHistory(instance, createEmptyHistoryState(), 300),
+      registerEmoji(instance)
     );
     registerListeners(instance as LexicalEditor)
 
