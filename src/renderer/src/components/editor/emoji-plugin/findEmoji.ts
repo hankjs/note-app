@@ -1,11 +1,3 @@
-/**
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
-
 import emojis from './emoji.json';
 
 export type EmojiMatch = Readonly<{
@@ -15,27 +7,30 @@ export type EmojiMatch = Readonly<{
 }>;
 
 /**
- * Map where keys are possible replacements while values are unified emoji IDs
- * These IDs are essentially hex encoded UTF-8 characters
+ * 映射表，键为可能的替换内容，值为统一的 emoji ID
+ * 这些 ID 本质上是十六进制编码的 UTF-8 字符
  */
 const emojiReplacementMap = emojis.reduce<Map<string, string>>((acc, row) => {
   if (!row.has_img_facebook) {
     return acc;
   }
   acc.set(`:${row.short_name}:`, row.unified);
+  acc.set(`：${row.short_name}：`, row.unified);
 
   if (row.text != null) {
     acc.set(row.text, row.unified);
+    acc.set(row.text.replace(/:/g, '：'), row.unified);
   }
   if (row.texts != null) {
     row.texts.forEach((text) => acc.set(text, row.unified));
+    row.texts.forEach((text) => acc.set(text.replace(/:/g, '：'), row.unified));
   }
 
   return acc;
 }, new Map());
 
 /**
- * Finds emoji shortcodes in text and if found - returns its position in text, matched shortcode and unified ID
+ * 在文本中查找 emoji shortcode，如果找到则返回其在文本中的位置、匹配到的 shortcode 以及统一 ID
  */
 export default function findEmoji(text: string): EmojiMatch | null {
   const skippedText: string[] = [];
@@ -46,7 +41,7 @@ export default function findEmoji(text: string): EmojiMatch | null {
       continue;
     }
     if (skippedText.length > 0) {
-      // Compensate for space between skippedText and word
+      // 补偿 skippedText 和 word 之间的空格
       skippedText.push('');
     }
 

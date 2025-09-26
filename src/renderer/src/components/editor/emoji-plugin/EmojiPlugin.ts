@@ -1,11 +1,3 @@
-/**
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
-
 import {LexicalEditor, TextNode} from 'lexical';
 
 import {$createEmojiNode} from './EmojiNode';
@@ -18,8 +10,8 @@ function $textNodeTransform(node: TextNode): void {
 
   const text = node.getTextContent();
 
-  // Find only 1st occurrence as transform will be re-run anyway for the rest
-  // because newly inserted nodes are considered to be dirty
+  // 只查找第一个出现的位置，因为对于其余部分，转换函数会再次运行
+  // 因为新插入的节点会被视为“脏节点”而重新触发转换
   const emojiMatch = findEmoji(text);
   if (emojiMatch === null) {
     return;
@@ -27,12 +19,12 @@ function $textNodeTransform(node: TextNode): void {
 
   let targetNode;
   if (emojiMatch.position === 0) {
-    // First text chunk within string, splitting into 2 parts
+    // 字符串的第一个文本片段，分割成两部分
     [targetNode] = node.splitText(
       emojiMatch.position + emojiMatch.shortcode.length,
     );
   } else {
-    // In the middle of a string
+    // 字符串中间
     [, targetNode] = node.splitText(
       emojiMatch.position,
       emojiMatch.position + emojiMatch.shortcode.length,
@@ -44,7 +36,7 @@ function $textNodeTransform(node: TextNode): void {
 }
 
 export function registerEmoji(editor: LexicalEditor): () => void {
-  // We don't use editor.registerUpdateListener here as alternative approach where we rely
-  // on update listener is highly discouraged as it triggers an additional render (the most expensive lifecycle operation).
+  // 這裡不使用 editor.registerUpdateListener，因為依賴 update listener 的替代方案非常不建議，
+  // 它會觸發額外的渲染（這是最耗資源的生命週期操作）。
   return editor.registerNodeTransform(TextNode, $textNodeTransform);
 }

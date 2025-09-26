@@ -19,7 +19,7 @@ import type { LexicalEditorConfig } from '@/types/lexical'
 import { LexicalEditor } from 'lexical'
 import { createLexicalTheme } from '@renderer/utils/lexicalTheme'
 import { createEditor, HISTORY_MERGE_TAG } from 'lexical';
-import { useListeners } from './userListeners'
+import { registerListeners } from './userListeners'
 import { LexicalEditorEvent } from './type'
 
 import { registerDragonSupport } from '@lexical/dragon';
@@ -30,7 +30,7 @@ import { mergeRegister } from '@lexical/utils';
 import {EmojiNode} from './emoji-plugin/EmojiNode';
 import {registerEmoji} from './emoji-plugin/EmojiPlugin';
 
-import prepopulatedRichText from './prepopulatedRichText';
+import { prepopulatedRichText } from './prepopulatedRichText';
 
 interface Props {
   modelValue?: string
@@ -55,8 +55,7 @@ const content = ref(props.modelValue)
 const editorState = ref<any>(null)
 
 const editorInstanceRef = shallowRef<LexicalEditor | null>(null)
-
-const { registerListeners } = useListeners()
+const editorInstanceCleanRef = shallowRef<() => void>(() => {})
 
 // 初始化编辑器 - 参考标准 Lexical 模式
 const initEditor = async (el: HTMLElement) => {
@@ -79,18 +78,24 @@ const initEditor = async (el: HTMLElement) => {
     const instance = createEditor(config) as LexicalEditor;
     instance.setRootElement(el);
 
+    /**
+     * 返回一個函式，當被呼叫時會執行所有傳入的函式。
+     * 通常用於註冊多個 Lexical 監聽器，
+     * 並可透過單一函式呼叫來一次性移除這些監聽器，類似於 React 的 useEffect hook。
+     */
     // Registering Plugins
-    mergeRegister(
+    const cleanup = mergeRegister(
       registerRichText(instance),
       registerDragonSupport(instance),
       registerHistory(instance, createEmptyHistoryState(), 300),
-      registerEmoji(instance)
+      registerEmoji(instance),
+      registerListeners(instance)
     );
-    registerListeners(instance as LexicalEditor)
 
     instance.update(prepopulatedRichText, { tag: HISTORY_MERGE_TAG });
 
     editorInstanceRef.value = instance
+    editorInstanceCleanRef.value = cleanup
     emit('init', instance as LexicalEditor)
   } catch (error) {
     console.error('LexicalEditor: 编辑器初始化失败:', error)
@@ -120,6 +125,7 @@ onUnmounted(() => {
   // 清理 DOM 元素上的引用
   if (editorRef.value) {
     delete (editorRef.value as any).lexicalEditor
+    editorInstanceCleanRef.value()
   }
 })
 </script>

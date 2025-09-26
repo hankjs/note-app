@@ -62,6 +62,7 @@
     "electron-updater": "^6.3.9",
     "fuse.js": "^7.1.0",
     "highlight.js": "^11.11.1",
+    "inline-style-parser": "^0.2.4",
     "isolated-vm": "^6.0.1",
     "katex": "^0.16.22",
     "lexical": "0.35.0",

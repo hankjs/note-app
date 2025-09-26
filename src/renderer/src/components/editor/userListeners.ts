@@ -1,36 +1,31 @@
 import { type LexicalEditor, ParagraphNode } from 'lexical';
-import { onUnmounted, ShallowReactive, shallowReactive } from 'vue';
 
 type UnmountListeners = () => void;
 
-type ListenerManager = ShallowReactive<Map<string, UnmountListeners>>
+type ListenerManager = Map<string, UnmountListeners>
 
-export function useListeners() {
-  const unmountListeners = shallowReactive<Map<string, UnmountListeners>>(new Map())
+export function registerListeners(editor: LexicalEditor) {
+  const unmountListeners = new Map<string, UnmountListeners>()
 
-  onUnmounted(() => {
+  registerUpdateListener(editor, unmountListeners);
+  registerTextContentListener(editor, unmountListeners);
+  registerMutationListener(editor, unmountListeners);
+  registerEditableListener(editor, unmountListeners);
+  registerDecoratorListener(editor, unmountListeners);
+  registerRootListener(editor, unmountListeners);
+
+  const cleanup = () => {
     unmountListeners.forEach((listener) => listener());
-  });
-
-  const registerListeners = (editor: LexicalEditor) => {
-    registerUpdateListener(editor, unmountListeners);
-    registerTextContentListener(editor, unmountListeners);
-    registerMutationListener(editor, unmountListeners);
-    registerEditableListener(editor, unmountListeners);
-    registerDecoratorListener(editor, unmountListeners);
-    registerRootListener(editor, unmountListeners);
   }
 
-  return {
-    registerListeners
-  }
+  return cleanup
 }
 
 function registerUpdateListener(editor: LexicalEditor, listenerManager: ListenerManager) {
-  const removeUpdateListener = editor.registerUpdateListener(({editorState}) => {
+  const removeUpdateListener = editor.registerUpdateListener(({ editorState }) => {
     // The latest EditorState can be found as `editorState`.
     // To read the contents of the EditorState, use the following API:
-  
+
     editorState.read(() => {
       // Just like editor.update(), .read() expects a closure where you can use
       // the $ prefixed helper functions.
@@ -47,7 +42,7 @@ function registerTextContentListener(editor: LexicalEditor, listenerManager: Lis
       console.log('registerTextContentListener: ', textContent);
     },
   );
-  
+
   listenerManager.set('textContent', () => removeTextContentListener());
 }
 
@@ -64,7 +59,7 @@ function registerMutationListener(editor: LexicalEditor, listenerManager: Listen
         console.log(nodeKey, mutation)
       }
     },
-    {skipInitialization: false}
+    { skipInitialization: false }
   );
 
   listenerManager.set('mutation', () => removeMutationListener());
@@ -95,10 +90,10 @@ function registerDecoratorListener(editor: LexicalEditor, listenerManager: Liste
 function registerRootListener(editor: LexicalEditor, listenerManager: ListenerManager) {
   const removeRootListener = editor.registerRootListener(
     (rootElement, prevRootElement) => {
-    //add listeners to the new root element
-    //remove listeners from the old root element
-    console.log('registerRootListener: rootElement', rootElement)
-    console.log('registerRootListener: prevRootElement', prevRootElement)
+      //add listeners to the new root element
+      //remove listeners from the old root element
+      console.log('registerRootListener: rootElement', rootElement)
+      console.log('registerRootListener: prevRootElement', prevRootElement)
     },
   );
 
