@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import LexicalEditor from './LexicalEditor.vue'
+import LexicalEditor from './LexicalEditor/LexicalEditor.vue'
 import LexicalToolbar from './LexicalToolbar.vue'
 import type { LexicalEditorConfig } from '@/types/lexical'
 

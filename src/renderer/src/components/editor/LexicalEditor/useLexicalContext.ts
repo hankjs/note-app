@@ -22,9 +22,6 @@ export interface LexicalContext {
   // 编辑器状态
   editorState: Ref<any>
   
-  // 是否显示调试信息
-  showDebug: Ref<boolean>
-  
   // 编辑器是否已初始化
   isInitialized: Ref<boolean>
   
@@ -35,7 +32,6 @@ export interface LexicalContext {
   setEditor: (instance: LexicalEditor | null) => void
   setContent: (content: string) => void
   setConfig: (config: LexicalEditorConfig) => void
-  setShowDebug: (show: boolean) => void
   setError: (error: Error | null) => void
   updateEditorState: (state: any) => void
   cleanup: () => void
@@ -56,7 +52,6 @@ export function useLexicalContext() {
   })
   const content = ref('')
   const editorState = ref<any>(null)
-  const showDebug = ref(false)
   const isInitialized = ref(false)
   const error = ref<Error | null>(null)
   
@@ -71,8 +66,29 @@ export function useLexicalContext() {
     editor.value = instance
     isInitialized.value = !!instance
     listenerManager.value = new Map()
-    if (instance) {
-      error.value = null // 清除之前的错误
+    if (!instance) {
+      return
+    }
+
+    error.value = null // 清除之前的错误
+
+    const removeUpdateListener = instance.registerUpdateListener(({ editorState }) => {
+      // The latest EditorState can be found as `editorState`.
+      // To read the contents of the EditorState, use the following API:
+      context.updateEditorState(editorState)
+      const json = JSON.stringify(editorState.toJSON())
+      console.log('registerUpdateListener: editorState', json)
+  
+      editorState.read(() => {
+        // Just like editor.update(), .read() expects a closure where you can use
+        // the $ prefixed helper functions.
+      });
+    }); 
+    listenerManager.value.set('update', () => removeUpdateListener())
+
+    if (content.value) {
+      const state = instance.parseEditorState(content.value);
+      instance.setEditorState(state);
     }
   }
   
@@ -82,10 +98,6 @@ export function useLexicalContext() {
   
   const setConfig = (newConfig: LexicalEditorConfig) => {
     config.value = { ...config.value, ...newConfig }
-  }
-  
-  const setShowDebug = (show: boolean) => {
-    showDebug.value = show
   }
   
   const setError = (err: Error | null) => {
@@ -121,13 +133,11 @@ export function useLexicalContext() {
     config,
     content,
     editorState,
-    showDebug,
     isInitialized,
     error,
     setEditor,
     setContent,
     setConfig,
-    setShowDebug,
     setError,
     updateEditorState,
     cleanup,
@@ -160,13 +170,11 @@ export function useLexicalEditor() {
     config: context.config,
     content: context.content,
     editorState: context.editorState,
-    showDebug: context.showDebug,
     isInitialized: context.isInitialized,
     error: context.error,
     setEditor: context.setEditor,
     setContent: context.setContent,
     setConfig: context.setConfig,
-    setShowDebug: context.setShowDebug,
     setError: context.setError,
     updateEditorState: context.updateEditorState,
     cleanup: context.cleanup,

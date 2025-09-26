@@ -1,43 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import LexicalEditor from '../editor/LexicalEditor.vue'
-import Toolbar from '../editor/Toolbar.vue'
+import LexicalComposer from '../editor/LexicalEditor/LexicalComposer.vue'
+import LexicalEditor from '../editor/LexicalEditor/LexicalEditor.vue'
 import type { LexicalEditor as LexicalEditorType } from 'lexical'
-import { useLexicalContext, provideLexicalContext } from '@/composables/useLexicalContext'
 
-// 创建并提供 Lexical 上下文
-const lexicalContext = useLexicalContext()
-provideLexicalContext(lexicalContext)
-
-// 从 context 获取状态和方法
-const {
-  editor,
-  config,
-  content,
-  showDebug,
-  isInitialized,
-  error,
-  setContent,
-  setConfig,
-  setShowDebug,
-  setEditor,
-  setError
-} = lexicalContext
-
-// 初始化配置
-setConfig({
-  namespace: 'DebuggerEditor',
-  editable: true,
-  autoFocus: false
-})
-
-setShowDebug(true) // 在 Debugger 中默认显示调试信息
+const content = ref(`{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":" Try typing in ","type":"text","version":1},{"detail":0,"format":1,"mode":"normal","style":"","text":"some smiles. ","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":"For example: ","type":"text","version":1},{"detail":0,"format":16,"mode":"normal","style":"","text":":)","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":", ","type":"text","version":1},{"detail":0,"format":16,"mode":"normal","style":"","text":":smiley:","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":".","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":null,"format":"","indent":0,"type":"root","version":1}}`)
 
 // 事件处理
 const handleChange = (...args: [value: string] | [id: number]) => {
   const value = args[0]
   if (typeof value === 'string') {
-    setContent(value)
     console.log('LexicalEditor: 内容变化', value)
   }
 }
@@ -52,50 +24,41 @@ const handleBlur = () => {
 
 const handleError = (error: Error) => {
   console.log('LexicalEditor: 错误', error)
-  setError(error)
 }
 
 const handleInit = (instance: LexicalEditorType) => {
   console.log('LexicalEditor: 初始化', instance)
-  setEditor(instance)
 }
 
 </script>
 
 <template>
-  <div class="debugger-container">
-    <!-- 工具栏 -->
-    <!-- 
-    <Toolbar 
-      v-if="editor" 
-      :editor="editor as any" 
-      :active-editor="editor as any" 
-    />
-    -->
+  <LexicalComposer 
+    :initialConfig="{
+      namespace: 'DebuggerEditor',
+      editable: true,
+      autoFocus: false
+    }"
+  >
+      <!-- 工具栏 -->
+      <!-- 
+      <Toolbar 
+        v-if="editor" 
+        :editor="editor as any" 
+        :active-editor="editor as any" 
+      />
+      -->
 
-    <!-- 编辑器 -->
-    <LexicalEditor 
-      v-model="content" 
-      :show-debug="showDebug"
-      @init="handleInit" 
-      @change="handleChange" 
-      @focus="handleFocus"
-      @blur="handleBlur" 
-      @error="handleError" 
-    />
-    
-    <!-- 调试信息面板 -->
-    <div v-if="showDebug" class="debug-panel">
-      <h4>调试面板</h4>
-      <div class="debug-info">
-        <p><strong>编辑器状态:</strong> {{ isInitialized ? '已初始化' : '未初始化' }}</p>
-        <p><strong>内容长度:</strong> {{ content.length }}</p>
-        <p><strong>命名空间:</strong> {{ config.namespace }}</p>
-        <p><strong>可编辑:</strong> {{ config.editable ? '是' : '否' }}</p>
-        <p v-if="error"><strong>错误:</strong> {{ error.message }}</p>
-      </div>
-    </div>
-  </div>
+      <!-- 编辑器 -->
+      <LexicalEditor 
+        v-model="content"
+        @init="handleInit" 
+        @change="handleChange" 
+        @focus="handleFocus"
+        @blur="handleBlur" 
+        @error="handleError" 
+      />
+  </LexicalComposer>
 </template>
 
 <style scoped>

@@ -2,16 +2,6 @@
   <div class="lexical-editor">
     <!-- 编辑器容器 -->
     <div ref="editorRef" class="editor-container" contenteditable="true"></div>
-
-    <!-- 调试信息（开发环境） -->
-    <div v-if="contextShowDebug" class="debug-info">
-      <h4>调试信息</h4>
-      <p>内容长度: {{ contextContent.length }}</p>
-      <p>编辑器状态: {{ contextEditorState ? '已初始化' : '未初始化' }}</p>
-      <p>编辑器实例: {{ contextEditor ? '已创建' : '未创建' }}</p>
-      <p>初始化状态: {{ isInitialized ? '已初始化' : '未初始化' }}</p>
-      <p v-if="contextError">错误: {{ contextError.message }}</p>
-    </div>
   </div>
 </template>
 
@@ -21,29 +11,26 @@ import type { LexicalEditorConfig } from '@/types/lexical'
 import { LexicalEditor } from 'lexical'
 import { createLexicalTheme } from '@renderer/utils/lexicalTheme'
 import { createEditor, HISTORY_MERGE_TAG } from 'lexical';
-import { registerListeners } from './userListeners'
-import { LexicalEditorEvent } from './type'
-import { useLexicalEditor } from '@/composables/useLexicalContext'
+import { registerListeners } from '../userListeners'
+import { LexicalEditorEvent } from '../type'
+import { useLexicalEditor } from './useLexicalContext'
 
 import { registerDragonSupport } from '@lexical/dragon';
 import { createEmptyHistoryState, registerHistory } from '@lexical/history';
 import { HeadingNode, QuoteNode, registerRichText } from '@lexical/rich-text';
 import { mergeRegister } from '@lexical/utils';
 
-import {EmojiNode} from './emoji-plugin/EmojiNode';
-import {registerEmoji} from './emoji-plugin/EmojiPlugin';
+import {EmojiNode} from '../emoji-plugin/EmojiNode';
+import {registerEmoji} from '../emoji-plugin/EmojiPlugin';
 
-import { prepopulatedRichText } from './prepopulatedRichText';
+import { prepopulatedRichText } from '../prepopulatedRichText';
 
 interface Props {
   modelValue?: string
-  config?: LexicalEditorConfig
-  showDebug?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
-  showDebug: false
 })
 
 const emit = defineEmits<LexicalEditorEvent>()
@@ -53,31 +40,15 @@ const {
   editor: contextEditor,
   config: contextConfig,
   content: contextContent,
-  editorState: contextEditorState,
-  showDebug: contextShowDebug,
-  isInitialized,
   error: contextError,
   setEditor,
   setContent,
-  setConfig,
-  setShowDebug,
   setError,
   cleanup: contextCleanup,
   addCleanup
 } = useLexicalEditor()
 
 const editorRef = ref<HTMLElement>()
-
-// 同步 props 到 context
-watch(() => props.config, (newConfig) => {
-  if (newConfig) {
-    setConfig(newConfig)
-  }
-}, { immediate: true })
-
-watch(() => props.showDebug, (newShowDebug) => {
-  setShowDebug(newShowDebug)
-}, { immediate: true })
 
 watch(() => props.modelValue, (newValue) => {
   if (newValue !== contextContent.value) {
@@ -113,7 +84,7 @@ const initEditor = async (el: HTMLElement) => {
 
   try {
     const editorConfig = {
-      namespace: contextConfig.value.namespace || 'Hank Editor',
+      namespace: contextConfig.value.namespace || `LexicalEditor_${Date.now()}`,
       theme: createLexicalTheme(),
       nodes: [HeadingNode, QuoteNode, EmojiNode],
       onError: (error: Error) => {
@@ -139,10 +110,11 @@ const initEditor = async (el: HTMLElement) => {
       registerListeners(instance)
     );
 
-    instance.update(prepopulatedRichText, { tag: HISTORY_MERGE_TAG });
+    // instance.update(prepopulatedRichText, { tag: HISTORY_MERGE_TAG });
 
     // 使用 context 方法设置编辑器实例
     setEditor(instance)
+    // 添加清理函数
     addCleanup(cleanup)
     // 清除错误状态
     setError(null)
