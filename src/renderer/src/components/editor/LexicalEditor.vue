@@ -4,23 +4,26 @@
     <div ref="editorRef" class="editor-container" contenteditable="true"></div>
 
     <!-- 调试信息（开发环境） -->
-    <div v-if="showDebug" class="debug-info">
+    <div v-if="contextShowDebug" class="debug-info">
       <h4>调试信息</h4>
-      <p>内容长度: {{ content.length }}</p>
-      <p>编辑器状态: {{ editorState ? '已初始化' : '未初始化' }}</p>
-      <p>编辑器实例: {{ editor ? '已创建' : '未创建' }}</p>
+      <p>内容长度: {{ contextContent.length }}</p>
+      <p>编辑器状态: {{ contextEditorState ? '已初始化' : '未初始化' }}</p>
+      <p>编辑器实例: {{ contextEditor ? '已创建' : '未创建' }}</p>
+      <p>初始化状态: {{ isInitialized ? '已初始化' : '未初始化' }}</p>
+      <p v-if="contextError">错误: {{ contextError.message }}</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, nextTick, watchEffect, shallowRef } from 'vue'
+import { ref, onUnmounted, watch, shallowRef } from 'vue'
 import type { LexicalEditorConfig } from '@/types/lexical'
 import { LexicalEditor } from 'lexical'
 import { createLexicalTheme } from '@renderer/utils/lexicalTheme'
 import { createEditor, HISTORY_MERGE_TAG } from 'lexical';
 import { registerListeners } from './userListeners'
 import { LexicalEditorEvent } from './type'
+import { useLexicalEditor } from '@/composables/useLexicalContext'
 
 import { registerDragonSupport } from '@lexical/dragon';
 import { createEmptyHistoryState, registerHistory } from '@lexical/history';
@@ -40,22 +43,66 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
-  config: () => ({
-    namespace: 'DefaultEditor',
-    editable: true,
-    autoFocus: false
-  }),
   showDebug: false
 })
 
 const emit = defineEmits<LexicalEditorEvent>()
 
-const editorRef = ref<HTMLElement>()
-const content = ref(props.modelValue)
-const editorState = ref<any>(null)
+// 使用 Lexical 上下文
+const {
+  editor: contextEditor,
+  config: contextConfig,
+  content: contextContent,
+  editorState: contextEditorState,
+  showDebug: contextShowDebug,
+  isInitialized,
+  error: contextError,
+  setEditor,
+  setContent,
+  setConfig,
+  setShowDebug,
+  setError,
+  cleanup: contextCleanup,
+  addCleanup
+} = useLexicalEditor()
 
-const editorInstanceRef = shallowRef<LexicalEditor | null>(null)
-const editorInstanceCleanRef = shallowRef<() => void>(() => {})
+const editorRef = ref<HTMLElement>()
+
+// 同步 props 到 context
+watch(() => props.config, (newConfig) => {
+  if (newConfig) {
+    setConfig(newConfig)
+  }
+}, { immediate: true })
+
+watch(() => props.showDebug, (newShowDebug) => {
+  setShowDebug(newShowDebug)
+}, { immediate: true })
+
+watch(() => props.modelValue, (newValue) => {
+  if (newValue !== contextContent.value) {
+    setContent(newValue)
+  }
+}, { immediate: true })
+
+// 监听 context 变化并 emit 事件
+watch(contextContent, (newContent) => {
+  if (newContent !== props.modelValue) {
+    emit('change', newContent)
+  }
+})
+
+watch(contextEditor, (newEditor) => {
+  if (newEditor) {
+    emit('init', newEditor)
+  }
+})
+
+watch(contextError, (newError) => {
+  if (newError) {
+    emit('error', newError)
+  }
+})
 
 // 初始化编辑器 - 参考标准 Lexical 模式
 const initEditor = async (el: HTMLElement) => {
@@ -65,17 +112,17 @@ const initEditor = async (el: HTMLElement) => {
   }
 
   try {
-    const config = {
-      namespace: 'Hank Editor',
+    const editorConfig = {
+      namespace: contextConfig.value.namespace || 'Hank Editor',
       theme: createLexicalTheme(),
       nodes: [HeadingNode, QuoteNode, EmojiNode],
       onError: (error: Error) => {
         console.error(error)
-
+        setError(error)
       }
     };
 
-    const instance = createEditor(config) as LexicalEditor;
+    const instance = createEditor(editorConfig) as LexicalEditor;
     instance.setRootElement(el);
 
     /**
@@ -94,12 +141,14 @@ const initEditor = async (el: HTMLElement) => {
 
     instance.update(prepopulatedRichText, { tag: HISTORY_MERGE_TAG });
 
-    editorInstanceRef.value = instance
-    editorInstanceCleanRef.value = cleanup
-    emit('init', instance as LexicalEditor)
+    // 使用 context 方法设置编辑器实例
+    setEditor(instance)
+    addCleanup(cleanup)
+    // 清除错误状态
+    setError(null)
   } catch (error) {
     console.error('LexicalEditor: 编辑器初始化失败:', error)
-    emit('error', error as Error)
+    setError(error as Error)
   }
 }
 
@@ -122,11 +171,8 @@ watch(() => editorRef.value, (newValue, oldValue) => {
 // 组件卸载时清理
 onUnmounted(() => {
   console.log('LexicalEditor: 组件已卸载')
-  // 清理 DOM 元素上的引用
-  if (editorRef.value) {
-    delete (editorRef.value as any).lexicalEditor
-    editorInstanceCleanRef.value()
-  }
+  // 使用 context 清理方法
+  contextCleanup()
 })
 </script>
 
