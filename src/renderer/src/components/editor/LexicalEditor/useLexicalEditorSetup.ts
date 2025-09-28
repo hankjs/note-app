@@ -1,6 +1,6 @@
 import { ref, onUnmounted, watch, type Ref } from 'vue'
 import { LexicalEditor } from 'lexical'
-import { createLexicalTheme } from '@renderer/utils/lexicalTheme'
+import { createLexicalTheme } from '@/utils/lexicalTheme'
 import { createEditor } from 'lexical'
 import { registerListeners } from '@/components/editor/userListeners'
 import { LexicalEditorEvent } from '@/components/editor/type'
