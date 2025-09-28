@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useLexicalEditor } from '../editor/LexicalEditor/useLexicalContext'
+import { useLexicalEditor } from '../../composables/useLexicalContext'
 
 const str = localStorage.getItem('editor-content')
 const content = ref(str ? str : `{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":" Try typing in ","type":"text","version":1},{"detail":0,"format":1,"mode":"normal","style":"","text":"some smiles. ","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":"For example: ","type":"text","version":1},{"detail":0,"format":16,"mode":"normal","style":"","text":":)","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":", ","type":"text","version":1},{"detail":0,"format":16,"mode":"normal","style":"","text":":smiley:","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":".","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":null,"format":"","indent":0,"type":"root","version":1}}`)

@@ -15,6 +15,10 @@ export default defineConfig({
         maxForks: 1
       }
     },
+    include: [
+      'test/**/*.{test,spec}.?(c|m)[jt]s?(x)',
+      'src/**/*.{test,spec}.?(c|m)[jt]s?(x)',
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -22,6 +26,7 @@ export default defineConfig({
         'node_modules/',
         'dist/',
         'test/',
+        'tests/',
         '**/*.d.ts',
         '**/*.config.*',
         '**/coverage/**'

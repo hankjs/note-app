@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { onUnmounted } from 'vue'
-import { useLexicalContext, provideLexicalContext, type LexicalContext } from './useLexicalContext'
+import { useLexicalContext, provideLexicalContext, type LexicalContext } from '../../../composables/useLexicalContext'
 import type { LexicalEditorConfig } from '@/types/lexical'
 
 interface Props {

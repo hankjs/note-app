@@ -13,7 +13,7 @@ import { createLexicalTheme } from '@renderer/utils/lexicalTheme'
 import { createEditor, HISTORY_MERGE_TAG } from 'lexical';
 import { registerListeners } from '../userListeners'
 import { LexicalEditorEvent } from '../type'
-import { useLexicalEditor } from './useLexicalContext'
+import { useLexicalEditor } from '../../../composables/useLexicalContext'
 
 import { registerDragonSupport } from '@lexical/dragon';
 import { createEmptyHistoryState, registerHistory } from '@lexical/history';

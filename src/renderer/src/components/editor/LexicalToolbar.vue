@@ -166,7 +166,7 @@ import {
   type TextFormatType,
   type BlockType
 } from '@/utils/lexicalCommands'
-import { useLexicalEditor } from './LexicalEditor/useLexicalContext'
+import { useLexicalEditor } from '../../composables/useLexicalContext'
 
 const context = useLexicalEditor()
 
