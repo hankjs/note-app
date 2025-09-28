@@ -166,12 +166,9 @@ import {
   type TextFormatType,
   type BlockType
 } from '@/utils/lexicalCommands'
+import { useLexicalEditor } from './LexicalEditor/useLexicalContext'
 
-interface Props {
-  editor?: any // LexicalEditor instance
-}
-
-const props = defineProps<Props>()
+const context = useLexicalEditor()
 
 // 响应式状态
 const currentBlockType = ref<BlockType>('paragraph')
@@ -195,73 +192,73 @@ const isListActive = (listType: 'bullet' | 'number') => {
 
 // 格式化文本
 const handleFormatText = (format: TextFormatType) => {
-  if (!props.editor) {
+  if (!context.editor.value) {
     console.warn('Editor not available for formatting')
     return
   }
   
-  console.log(`Formatting text: ${format}`, 'Editor:', props.editor)
-  formatText(props.editor, format)
+  console.log(`Formatting text: ${format}`, 'Editor:', context.editor.value)
+  formatText(context.editor.value, format)
 }
 
 // 改变块类型
 const changeBlockType = () => {
-  if (!props.editor) return
+  if (!context.editor.value) return
   
   console.log(`Changing block type to: ${currentBlockType.value}`)
-  setBlockType(props.editor, currentBlockType.value)
+  setBlockType(context.editor.value, currentBlockType.value)
 }
 
 // 插入列表
 const insertList = (listType: 'bullet' | 'number') => {
-  if (!props.editor) return
+  if (!context.editor.value) return
   
   console.log(`Inserting ${listType} list`)
   
-  const listState = isInList(props.editor)
+  const listState = isInList(context.editor.value)
   
   if (listState.isInList && listState.listType === listType) {
     // 如果已经是相同类型的列表，则移除列表
-    // removeList(props.editor)
+    // removeList(context.editor.value)
   } else {
     // 插入新列表
     if (listType === 'bullet') {
-      insertBulletList(props.editor)
+      insertBulletList(context.editor.value)
     } else {
-      insertNumberedList(props.editor)
+      insertNumberedList(context.editor.value)
     }
   }
 }
 
 // 插入链接
 const insertLink = () => {
-  if (!props.editor) return
+  if (!context.editor.value) return
   
-  toggleLink(props.editor)
+  toggleLink(context.editor.value)
 }
 
 // 清除格式
 const handleClearFormatting = () => {
-  if (!props.editor) return
+  if (!context.editor.value) return
   
   console.log('Clearing formatting')
-  clearFormatting(props.editor)
+  clearFormatting(context.editor.value)
 }
 
 // 撤销
 const handleUndo = () => {
-  if (!props.editor) return
+  if (!context.editor.value) return
   
   console.log('Undo')
-  undo(props.editor)
+  undo(context.editor.value)
 }
 
 // 重做
 const handleRedo = () => {
-  if (!props.editor) return
+  if (!context.editor.value) return
   
   console.log('Redo')
-  redo(props.editor)
+  redo(context.editor.value)
 }
 
 // 更新工具栏状态
@@ -270,8 +267,8 @@ const updateToolbarState = (formats: Set<TextFormatType>, blockType: BlockType) 
   currentBlockType.value = blockType
   
   // 更新列表状态
-  if (props.editor) {
-    currentListState.value = isInList(props.editor)
+  if (context.editor.value) {
+    currentListState.value = isInList(context.editor.value)
   }
   
   console.log('Toolbar state updated:', { formats, blockType, listState: currentListState.value })
@@ -317,8 +314,8 @@ const handleKeyDown = (event: KeyboardEvent) => {
 // 生命周期
 onMounted(() => {
   // 监听编辑器选择变化
-  if (props.editor) {
-    selectionListenerCleanup = registerSelectionListener(props.editor, updateToolbarState)
+  if (context.editor.value) {
+    selectionListenerCleanup = registerSelectionListener(context.editor.value, updateToolbarState)
   }
   
   // 注册快捷键
@@ -335,8 +332,3 @@ onUnmounted(() => {
   document.removeEventListener('keydown', handleKeyDown)
 })
 </script>
-
-<style scoped>
-/* 工具栏样式现在由 lexical-editor.css 提供 */
-/* 这里只保留组件特定的样式 */
-</style>

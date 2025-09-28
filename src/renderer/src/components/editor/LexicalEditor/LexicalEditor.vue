@@ -23,45 +23,30 @@ import { mergeRegister } from '@lexical/utils';
 import {EmojiNode} from '../emoji-plugin/EmojiNode';
 import {registerEmoji} from '../emoji-plugin/EmojiPlugin';
 
-import { prepopulatedRichText } from '../prepopulatedRichText';
-
 interface Props {
-  modelValue?: string
+  initialContent?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  modelValue: '',
+  initialContent: '',
 })
 
 const emit = defineEmits<LexicalEditorEvent>()
 
 // 使用 Lexical 上下文
+const context = useLexicalEditor()
 const {
   editor: contextEditor,
   config: contextConfig,
-  content: contextContent,
   error: contextError,
   setEditor,
   setContent,
   setError,
   cleanup: contextCleanup,
   addCleanup
-} = useLexicalEditor()
+} = context
 
 const editorRef = ref<HTMLElement>()
-
-watch(() => props.modelValue, (newValue) => {
-  if (newValue !== contextContent.value) {
-    setContent(newValue)
-  }
-}, { immediate: true })
-
-// 监听 context 变化并 emit 事件
-watch(contextContent, (newContent) => {
-  if (newContent !== props.modelValue) {
-    emit('change', newContent)
-  }
-})
 
 watch(contextEditor, (newEditor) => {
   if (newEditor) {
@@ -110,8 +95,10 @@ const initEditor = async (el: HTMLElement) => {
       registerListeners(instance)
     );
 
-    // instance.update(prepopulatedRichText, { tag: HISTORY_MERGE_TAG });
-
+    // 设置初始内容
+    if (props.initialContent) {
+      setContent(props.initialContent)
+    }
     // 使用 context 方法设置编辑器实例
     setEditor(instance)
     // 添加清理函数
@@ -123,8 +110,6 @@ const initEditor = async (el: HTMLElement) => {
     setError(error as Error)
   }
 }
-
-
 
 watch(() => editorRef.value, (newValue, oldValue) => {
   console.log('LexicalEditor: 编辑器元素变化', newValue, oldValue)
@@ -145,6 +130,14 @@ onUnmounted(() => {
   console.log('LexicalEditor: 组件已卸载')
   // 使用 context 清理方法
   contextCleanup()
+})
+
+const getContext = () => {
+  return context
+}
+
+defineExpose({
+  getContext
 })
 </script>
 

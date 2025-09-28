@@ -2,7 +2,6 @@ import { ref, shallowRef, provide, inject, type Ref } from 'vue'
 import type { LexicalEditor } from 'lexical'
 import type { LexicalEditorConfig } from '@/types/lexical'
 
-
 type UnmountListeners = () => void;
 
 type ListenerManager = Map<string, UnmountListeners>
@@ -60,6 +59,10 @@ export function useLexicalContext() {
 
   // 监听器管理器
   const listenerManager = ref<ListenerManager>(new Map())
+
+  const updateEditorState = (state: any) => {
+    editorState.value = state
+  }
   
   // 方法定义
   const setEditor = (instance: LexicalEditor | null) => {
@@ -72,19 +75,9 @@ export function useLexicalContext() {
 
     error.value = null // 清除之前的错误
 
-    const removeUpdateListener = instance.registerUpdateListener(({ editorState }) => {
-      // The latest EditorState can be found as `editorState`.
-      // To read the contents of the EditorState, use the following API:
-      context.updateEditorState(editorState)
-      const json = JSON.stringify(editorState.toJSON())
-      console.log('registerUpdateListener: editorState', json)
-  
-      editorState.read(() => {
-        // Just like editor.update(), .read() expects a closure where you can use
-        // the $ prefixed helper functions.
-      });
-    }); 
-    listenerManager.value.set('update', () => removeUpdateListener())
+    listenerManager.value.set(`update-${_uid++}`, instance.registerUpdateListener(({ editorState }) => {
+      updateEditorState(editorState)
+    }))
 
     if (content.value) {
       const state = instance.parseEditorState(content.value);
@@ -102,10 +95,6 @@ export function useLexicalContext() {
   
   const setError = (err: Error | null) => {
     error.value = err
-  }
-  
-  const updateEditorState = (state: any) => {
-    editorState.value = state
   }
   
   const cleanup = () => {

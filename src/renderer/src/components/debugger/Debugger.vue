@@ -3,15 +3,21 @@ import { ref } from 'vue'
 import LexicalComposer from '../editor/LexicalEditor/LexicalComposer.vue'
 import LexicalEditor from '../editor/LexicalEditor/LexicalEditor.vue'
 import type { LexicalEditor as LexicalEditorType } from 'lexical'
+import LexicalToolbar from '../editor/LexicalToolbar.vue'
 
-const content = ref(`{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":" Try typing in ","type":"text","version":1},{"detail":0,"format":1,"mode":"normal","style":"","text":"some smiles. ","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":"For example: ","type":"text","version":1},{"detail":0,"format":16,"mode":"normal","style":"","text":":)","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":", ","type":"text","version":1},{"detail":0,"format":16,"mode":"normal","style":"","text":":smiley:","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":".","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":null,"format":"","indent":0,"type":"root","version":1}}`)
+const str = localStorage.getItem('editor-content')
+const content = ref(str ? str : `{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":" Try typing in ","type":"text","version":1},{"detail":0,"format":1,"mode":"normal","style":"","text":"some smiles. ","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":"For example: ","type":"text","version":1},{"detail":0,"format":16,"mode":"normal","style":"","text":":)","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":", ","type":"text","version":1},{"detail":0,"format":16,"mode":"normal","style":"","text":":smiley:","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":".","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""}],"direction":null,"format":"","indent":0,"type":"root","version":1}}`)
 
-// 事件处理
-const handleChange = (...args: [value: string] | [id: number]) => {
-  const value = args[0]
-  if (typeof value === 'string') {
-    console.log('LexicalEditor: 内容变化', value)
+const editorRef = ref<InstanceType<typeof LexicalEditor>>()
+
+const handleSave = () => {
+  const context = editorRef.value?.getContext()
+  if (!context) {
+    return
   }
+  const json = context.editorState.value.toJSON()
+  localStorage.setItem('editor-content', JSON.stringify(json))
+
 }
 
 const handleFocus = () => {
@@ -40,6 +46,7 @@ const handleInit = (instance: LexicalEditorType) => {
       autoFocus: false
     }"
   >
+    <LexicalToolbar />
       <!-- 工具栏 -->
       <!-- 
       <Toolbar 
@@ -51,9 +58,9 @@ const handleInit = (instance: LexicalEditorType) => {
 
       <!-- 编辑器 -->
       <LexicalEditor 
-        v-model="content"
+        ref="editorRef"
+        :initial-content="content"
         @init="handleInit" 
-        @change="handleChange" 
         @focus="handleFocus"
         @blur="handleBlur" 
         @error="handleError" 

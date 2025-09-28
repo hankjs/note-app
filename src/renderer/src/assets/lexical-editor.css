@@ -474,9 +474,6 @@
   gap: var(--lexical-spacing-sm);
   padding: var(--lexical-spacing-md);
   background-color: var(--lexical-bg-secondary);
-  border: 1px solid var(--lexical-editor-border);
-  border-bottom: none;
-  border-radius: var(--lexical-editor-radius) var(--lexical-editor-radius) 0 0;
   flex-wrap: wrap;
 }
 
