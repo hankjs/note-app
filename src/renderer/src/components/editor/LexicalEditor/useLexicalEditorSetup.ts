@@ -1,21 +1,20 @@
 import { ref, onUnmounted, watch, type Ref } from 'vue'
-import { LexicalEditor } from 'lexical'
-import { createLexicalTheme } from '@/utils/lexicalTheme'
-import { createEditor } from 'lexical'
-import { registerListeners } from '@/components/editor/userListeners'
-import { LexicalEditorEvent } from '@/components/editor/type'
-import { useLexicalEditor } from '@/composables/useLexicalContext'
 
+import { createEditor, LexicalEditor } from 'lexical'
 import { HeadingNode, QuoteNode, registerRichText } from '@lexical/rich-text'
 import { ListItemNode, ListNode } from '@lexical/list'
 import { CodeHighlightNode, CodeNode } from '@lexical/code'
 import { AutoLinkNode, LinkNode } from '@lexical/link'
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table'
-
 import { registerDragonSupport } from '@lexical/dragon'
 import { createEmptyHistoryState, registerHistory } from '@lexical/history'
 import { mergeRegister } from '@lexical/utils'
 
+import { createLexicalTheme } from '@/utils/lexicalTheme'
+
+import { registerListeners } from '@/components/editor/userListeners'
+import { LexicalEditorEvent } from '@/components/editor/type'
+import { useLexicalEditor } from '@/composables/useLexicalContext'
 import { EmojiNode } from '@/components/editor/emoji-plugin/EmojiNode'
 import { registerEmoji } from '@/components/editor/emoji-plugin/EmojiPlugin'
 
