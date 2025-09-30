@@ -6,7 +6,7 @@
  *
  */
 
-import { onUnmounted, ref } from 'vue'
+import { onUnmounted, ref, unref } from 'vue'
 
 const getElement = (): HTMLElement => {
   let element = document.getElementById('report-container')
@@ -31,7 +31,11 @@ const getElement = (): HTMLElement => {
   return element
 }
 
-export function useReport(): (content: string) => ReturnType<typeof setTimeout> {
+export interface UseReport {
+  report: (content: string) => ReturnType<typeof setTimeout>
+}
+
+export function useReport(): UseReport {
   const timer = ref<ReturnType<typeof setTimeout> | null>(null)
 
   const cleanup = () => {
@@ -48,11 +52,7 @@ export function useReport(): (content: string) => ReturnType<typeof setTimeout> 
     }
   }
 
-  onUnmounted(() => {
-    cleanup()
-  })
-
-  return (content: string) => {
+  const report = (content: string) => {
     // eslint-disable-next-line no-console
     console.log(content)
     const element = getElement()
@@ -60,7 +60,16 @@ export function useReport(): (content: string) => ReturnType<typeof setTimeout> 
       clearTimeout(timer.value)
     }
     element.innerHTML = content
-    timer.value = setTimeout(cleanup, 1000)
-    return timer.value
+    const t = setTimeout(cleanup, 1000)
+    timer.value = t
+    return t
+  }
+
+  onUnmounted(() => {
+    cleanup()
+  })
+
+  return {
+    report
   }
 }
