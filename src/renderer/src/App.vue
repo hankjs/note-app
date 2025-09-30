@@ -3,11 +3,16 @@
 // import Sidebar from './components/layout/Sidebar.vue'
 // import ThemeToggle from './components/layout/ThemeToggle.vue'
 import Debugger from './components/debugger/Debugger.vue'
+import FlashMessageContextDemo from './components/ui/FlashMessageContextDemo.vue';
+import FlashMessageProvider from './components/ui/FlashMessageProvider.vue';
 </script>
 
 <template>
   <div class="app h-screen flex flex-col bg-white">
-    <Debugger />
+    <FlashMessageProvider>
+      <FlashMessageContextDemo />
+    </FlashMessageProvider>
+    <!-- <Debugger /> -->
 
     <template v-if="false">
     <!-- 主题切换按钮 -->
