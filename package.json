@@ -102,6 +102,7 @@
     "vite": "^7.0.5",
     "vitest": "^3.2.4",
     "vue": "^3.5.17",
+    "vue-component-type-helpers": "^3.1.0",
     "vue-eslint-parser": "^10.2.0",
     "vue-tsc": "^3.0.3"
   },

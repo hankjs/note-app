@@ -1,0 +1,230 @@
+# 待办事项
+
+## 转化文件
+
+- [ ] App.tsx
+- [x] appSettings.ts // appSettings.ts
+- [ ] collaboration.ts
+- [ ] commenting
+- [ ] └── index.ts
+- [ ] context
+- [x] ├── FlashMessageContext.tsx
+- [ ] ├── SettingsContext.tsx
+- [ ] ├── SharedHistoryContext.tsx
+- [ ] └── ToolbarContext.tsx
+- [ ] Editor.tsx
+- [ ] hooks
+- [x] ├── useFlashMessage.tsx
+- [x] ├── useModal.tsx
+- [ ] └── useReport.ts
+- [x] images // images
+- [x] index.css // assets/index.css
+- [x] index.tsx // main.ts
+- [ ] nodes
+- [ ] ├── AutocompleteNode.tsx
+- [ ] ├── DateTimeNode
+- [ ] │   ├── DateTimeComponent.tsx
+- [ ] │   ├── DateTimeNode.css
+- [ ] │   └── DateTimeNode.tsx
+- [ ] ├── EmojiNode.tsx
+- [ ] ├── EquationComponent.tsx
+- [ ] ├── EquationNode.tsx
+- [ ] ├── ExcalidrawNode
+- [ ] │   ├── ExcalidrawComponent.tsx
+- [ ] │   ├── ExcalidrawImage.tsx
+- [ ] │   └── index.tsx
+- [ ] ├── FigmaNode.tsx
+- [ ] ├── ImageComponent.tsx
+- [ ] ├── ImageNode.css
+- [ ] ├── ImageNode.tsx
+- [ ] ├── KeywordNode.ts
+- [ ] ├── LayoutContainerNode.ts
+- [ ] ├── LayoutItemNode.ts
+- [ ] ├── MentionNode.ts
+- [ ] ├── PageBreakNode
+- [ ] │   ├── index.css
+- [ ] │   └── index.tsx
+- [ ] ├── PlaygroundNodes.ts
+- [ ] ├── PollComponent.tsx
+- [ ] ├── PollNode.css
+- [ ] ├── PollNode.tsx
+- [ ] ├── SpecialTextNode.tsx
+- [ ] ├── StickyComponent.tsx
+- [ ] ├── StickyNode.css
+- [ ] ├── StickyNode.tsx
+- [ ] ├── TweetNode.tsx
+- [ ] └── YouTubeNode.tsx
+- [ ] plugins
+- [ ] ├── ActionsPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── AutocompletePlugin
+- [ ] │   └── index.tsx
+- [ ] ├── AutoEmbedPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── AutoLinkPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── CodeActionMenuPlugin
+- [ ] │   ├── components
+- [ ] │   │   ├── CopyButton
+- [ ] │   │   │   └── index.tsx
+- [ ] │   │   └── PrettierButton
+- [ ] │   │       ├── index.css
+- [ ] │   │       └── index.tsx
+- [ ] │   ├── index.css
+- [ ] │   ├── index.tsx
+- [ ] │   └── utils.ts
+- [ ] ├── CodeHighlightPrismPlugin
+- [ ] │   └── index.ts
+- [ ] ├── CodeHighlightShikiPlugin
+- [ ] │   └── index.ts
+- [ ] ├── CollapsiblePlugin
+- [ ] │   ├── Collapsible.css
+- [ ] │   ├── CollapsibleContainerNode.ts
+- [ ] │   ├── CollapsibleContentNode.ts
+- [ ] │   ├── CollapsibleTitleNode.ts
+- [ ] │   ├── CollapsibleUtils.ts
+- [ ] │   └── index.ts
+- [ ] ├── CommentPlugin
+- [ ] │   ├── index.css
+- [ ] │   └── index.tsx
+- [ ] ├── ComponentPickerPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── ContextMenuPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── DateTimePlugin
+- [ ] │   └── index.tsx
+- [ ] ├── DocsPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── DragDropPastePlugin
+- [ ] │   └── index.ts
+- [ ] ├── DraggableBlockPlugin
+- [ ] │   ├── index.css
+- [ ] │   └── index.tsx
+- [ ] ├── EmojiPickerPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── EmojisPlugin
+- [ ] │   └── index.ts
+- [ ] ├── EquationsPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── ExcalidrawPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── FigmaPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── FloatingLinkEditorPlugin
+- [ ] │   ├── index.css
+- [ ] │   └── index.tsx
+- [ ] ├── FloatingTextFormatToolbarPlugin
+- [ ] │   ├── index.css
+- [ ] │   └── index.tsx
+- [ ] ├── ImagesPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── KeywordsPlugin
+- [ ] │   └── index.ts
+- [ ] ├── LayoutPlugin
+- [ ] │   ├── InsertLayoutDialog.tsx
+- [ ] │   └── LayoutPlugin.tsx
+- [ ] ├── LinkPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── MarkdownShortcutPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── MarkdownTransformers
+- [ ] │   └── index.ts
+- [ ] ├── MaxLengthPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── MentionsPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── PageBreakPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── PasteLogPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── PollPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── ShortcutsPlugin
+- [ ] │   ├── index.tsx
+- [ ] │   └── shortcuts.ts
+- [ ] ├── SpecialTextPlugin
+- [ ] │   └── index.ts
+- [ ] ├── SpeechToTextPlugin
+- [ ] │   └── index.ts
+- [ ] ├── StickyPlugin
+- [ ] │   └── index.ts
+- [ ] ├── TabFocusPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── TableActionMenuPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── TableCellResizer
+- [ ] │   ├── index.css
+- [ ] │   └── index.tsx
+- [ ] ├── TableHoverActionsPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── TableOfContentsPlugin
+- [ ] │   ├── index.css
+- [ ] │   └── index.tsx
+- [ ] ├── TablePlugin.tsx
+- [ ] ├── TestRecorderPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── ToolbarPlugin
+- [ ] │   ├── fontSize.css
+- [ ] │   ├── fontSize.tsx
+- [ ] │   ├── index.tsx
+- [ ] │   └── utils.ts
+- [ ] ├── TreeViewPlugin
+- [ ] │   └── index.tsx
+- [ ] ├── TwitterPlugin
+- [ ] │   └── index.ts
+- [ ] ├── TypingPerfPlugin
+- [ ] │   └── index.ts
+- [ ] └── YouTubePlugin
+- [ ]     └── index.ts
+- [ ] server
+- [ ] └── validation.ts
+- [ ] Settings.tsx
+- [ ] setupEnv.ts
+- [ ] themes
+- [ ] ├── CommentEditorTheme.css
+- [ ] ├── CommentEditorTheme.ts
+- [ ] ├── PlaygroundEditorTheme.css
+- [ ] ├── PlaygroundEditorTheme.ts
+- [ ] ├── StickyEditorTheme.css
+- [ ] └── StickyEditorTheme.ts
+- [ ] ui
+- [ ] ├── Button.css
+- [ ] ├── Button.tsx
+- [ ] ├── ColorPicker.css
+- [ ] ├── ColorPicker.tsx
+- [ ] ├── ContentEditable.css
+- [ ] ├── ContentEditable.tsx
+- [ ] ├── Dialog.css
+- [ ] ├── Dialog.tsx
+- [ ] ├── DropDown.tsx
+- [ ] ├── DropdownColorPicker.tsx
+- [ ] ├── EquationEditor.css
+- [ ] ├── EquationEditor.tsx
+- [ ] ├── ExcalidrawModal.css
+- [ ] ├── ExcalidrawModal.tsx
+- [ ] ├── FileInput.tsx
+- [x] ├── FlashMessage.css
+- [x] ├── FlashMessage.tsx
+- [ ] ├── ImageResizer.tsx
+- [ ] ├── Input.css
+- [ ] ├── KatexEquationAlterer.css
+- [ ] ├── KatexEquationAlterer.tsx
+- [ ] ├── KatexRenderer.tsx
+- [x] ├── Modal.css
+- [x] ├── Modal.tsx
+- [ ] ├── Select.css
+- [ ] ├── Select.tsx
+- [ ] ├── Switch.tsx
+- [ ] └── TextInput.tsx
+- [x] utils
+- [x]    ├── docSerialization.ts
+- [x]    ├── emoji-list.ts
+- [x]    ├── getDOMRangeRect.ts
+- [x]    ├── getSelectedNode.ts
+- [x]    ├── getThemeSelector.ts
+- [x]    ├── isMobileWidth.ts
+- [x]    ├── joinClasses.ts
+- [x]    ├── setFloatingElemPosition.ts
+- [x]    ├── setFloatingElemPositionForLinkEditor.ts
+- [x]    ├── swipe.ts
+- [x]    └── url.ts

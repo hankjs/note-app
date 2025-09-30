@@ -100,7 +100,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import type { LexicalEditor } from 'lexical'
 import { useLexicalEditor } from '@/composables/useLexicalContext'
-import { useFlashMessageContext } from '@/composables/useFlashMessage'
+import { useFlashMessageContext } from '@renderer/components/ui/FlashMessage/useFlashMessage'
 import { useModal } from '@/composables/useModal'
 import ShowClearDialog from './ShowClearDialog.vue'
 // import { SPEECH_TO_TEXT_COMMAND, SUPPORT_SPEECH_RECOGNITION } from '../SpeechToTextPlugin'

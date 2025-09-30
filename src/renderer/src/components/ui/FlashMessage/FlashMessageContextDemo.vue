@@ -45,7 +45,7 @@ showFlashMessage('消息内容', 3000)</code></pre>
 </template>
 
 <script setup lang="ts">
-import { useFlashMessageContext } from '@/composables/useFlashMessage'
+import { useFlashMessageContext } from '@renderer/components/ui/FlashMessage/useFlashMessage'
 
 const { flashMessage, showFlashMessage, hideFlashMessage } = useFlashMessageContext()
 

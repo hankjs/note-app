@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { provideFlashMessageContext } from '@/composables/useFlashMessage'
+import { provideFlashMessageContext } from '@renderer/components/ui/FlashMessage/useFlashMessage'
 import FlashMessage from './FlashMessage.vue'
 
 // 提供 FlashMessage Context
