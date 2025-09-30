@@ -1,98 +1,76 @@
 <template>
   <div class="actions">
     <!-- Speech to Text Button -->
-    <button
-      v-if="SUPPORT_SPEECH_RECOGNITION"
-      @click="toggleSpeechToText"
+    <button v-if="SUPPORT_SPEECH_RECOGNITION" @click="toggleSpeechToText"
       :class="[
         'action-button action-button-mic',
         { active: isSpeechToText }
-      ]"
-      title="Speech To Text"
-      :aria-label="`${isSpeechToText ? 'Enable' : 'Disable'} speech to text`"
-    >
+      ]" title="Speech To Text"
+      :aria-label="`${isSpeechToText ? 'Enable' : 'Disable'} speech to text`">
       <i class="mic" />
     </button>
 
     <!-- Import Button -->
-    <button
-      class="action-button import"
-      @click="handleImport"
-      title="Import"
-      aria-label="Import editor state from JSON"
-    >
+    <button class="action-button import" @click="handleImport" title="Import"
+      aria-label="Import editor state from JSON">
       <i class="import" />
     </button>
 
     <!-- Export Button -->
-    <button
-      class="action-button export"
-      @click="handleExport"
-      title="Export"
-      aria-label="Export editor state to JSON"
-    >
+    <button class="action-button export" @click="handleExport" title="Export"
+      aria-label="Export editor state to JSON">
       <i class="export" />
     </button>
 
     <!-- Share Button -->
-    <button
-      class="action-button share"
+    <button class="action-button share"
       :disabled="isCollabActive || INITIAL_SETTINGS.isCollab"
-      @click="handleShare"
-      title="Share"
-      aria-label="Share Playground link to current editor state"
-    >
+      @click="handleShare" title="Share"
+      aria-label="Share Playground link to current editor state">
       <i class="share" />
     </button>
 
     <!-- Clear Button -->
-    <button
-      class="action-button clear"
-      :disabled="isEditorEmpty"
-      @click="showClearDialog"
-      title="Clear"
-      aria-label="Clear editor contents"
-    >
+    <button class="action-button clear" :disabled="isEditorEmpty"
+      @click="showClearDialog" title="Clear" aria-label="Clear editor contents">
       <i class="clear" />
     </button>
 
     <!-- Lock/Unlock Button -->
-    <button
-      :class="['action-button', !isEditable ? 'unlock' : 'lock']"
-      @click="toggleEditable"
-      title="Read-Only Mode"
-      :aria-label="`${!isEditable ? 'Unlock' : 'Lock'} read-only mode`"
-    >
+    <button :class="['action-button', !isEditable ? 'unlock' : 'lock']"
+      @click="toggleEditable" title="Read-Only Mode"
+      :aria-label="`${!isEditable ? 'Unlock' : 'Lock'} read-only mode`">
       <i :class="!isEditable ? 'unlock' : 'lock'" />
     </button>
 
     <!-- Markdown Toggle Button -->
-    <button
-      class="action-button"
-      @click="handleMarkdownToggle"
-      title="Convert From Markdown"
-      aria-label="Convert from markdown"
-    >
+    <button class="action-button" @click="handleMarkdownToggle"
+      title="Convert From Markdown" aria-label="Convert from markdown">
       <i class="markdown" />
     </button>
 
     <!-- Collaborative Editing Button -->
-    <button
-      v-if="isCollabActive"
-      class="action-button connect"
+    <button v-if="isCollabActive" class="action-button connect"
       @click="toggleConnect"
       :title="`${connected ? 'Disconnect' : 'Connect'} Collaborative Editing`"
-      :aria-label="`${connected ? 'Disconnect from' : 'Connect to'} a collaborative editing server`"
-    >
+      :aria-label="`${connected ? 'Disconnect from' : 'Connect to'} a collaborative editing server`">
       <i :class="connected ? 'disconnect' : 'connect'" />
     </button>
 
     <!-- Modal -->
-    <ShowClearDialog
-      v-if="modal"
-      :editor="editor!"
-      @close="closeModal"
-    />
+    <Modal>
+      <template #default>
+        Are you sure you want to clear the editor?
+        <div className="Modal__content">
+          <Button @click="handleModalClear">
+            Clear
+          </Button>
+          <Button class="ml-2" @click="handleModalCancel">
+            Cancel
+          </Button>
+        </div>
+      </template>
+    </Modal>
   </div>
 </template>
 
@@ -102,7 +80,6 @@ import type { LexicalEditor } from 'lexical'
 import { useLexicalEditor } from '@/composables/useLexicalContext'
 import { useFlashMessageContext } from '@renderer/components/ui/FlashMessage/useFlashMessage'
 import { useModal } from '@/composables/useModal'
-import ShowClearDialog from './ShowClearDialog.vue'
 // import { SPEECH_TO_TEXT_COMMAND, SUPPORT_SPEECH_RECOGNITION } from '../SpeechToTextPlugin'
 // import { PLAYGROUND_TRANSFORMERS } from '../MarkdownTransformers'
 import { docFromHash, docToHash } from '@/utils/docSerialization'
@@ -130,7 +107,9 @@ import {
   COLLABORATION_TAG,
   COMMAND_PRIORITY_EDITOR,
   HISTORIC_TAG,
+  CLEAR_EDITOR_COMMAND
 } from 'lexical'
+import Button from '@/components/ui/Button/index.vue'
 
 // Props
 interface Props {
@@ -146,7 +125,7 @@ const props = withDefaults(defineProps<Props>(), {
 // Composables
 const { editor } = useLexicalEditor()
 const { showFlashMessage } = useFlashMessageContext()
-const { modal, showModal, hideModal } = useModal()
+const [Modal, $Modal] = useModal()
 
 // Constants
 const INITIAL_SETTINGS = {
@@ -248,11 +227,18 @@ function handleShare() {
 }
 
 function showClearDialog() {
-  showModal('Clear editor')
+  $Modal.show('Clear editor')
 }
 
-function closeModal() {
-  hideModal()
+function handleModalClear() {
+  editor.value?.dispatchCommand(CLEAR_EDITOR_COMMAND, undefined)
+  editor.value?.focus()
+  $Modal.close()
+}
+
+function handleModalCancel() {
+  editor.value?.focus()
+  $Modal.close()
 }
 
 function toggleEditable() {
@@ -405,14 +391,43 @@ onMounted(() => {
 }
 
 /* Icon styles - these would need to be implemented with actual icons */
-.action-button i.mic::before { content: '🎤'; }
-.action-button i.import::before { content: '📁'; }
-.action-button i.export::before { content: '💾'; }
-.action-button i.share::before { content: '🔗'; }
-.action-button i.clear::before { content: '🗑️'; }
-.action-button i.lock::before { content: '🔒'; }
-.action-button i.unlock::before { content: '🔓'; }
-.action-button i.markdown::before { content: '📝'; }
-.action-button i.connect::before { content: '🔌'; }
-.action-button i.disconnect::before { content: '🔌'; }
+.action-button i.mic::before {
+  content: '🎤';
+}
+
+.action-button i.import::before {
+  content: '📁';
+}
+
+.action-button i.export::before {
+  content: '💾';
+}
+
+.action-button i.share::before {
+  content: '🔗';
+}
+
+.action-button i.clear::before {
+  content: '🗑️';
+}
+
+.action-button i.lock::before {
+  content: '🔒';
+}
+
+.action-button i.unlock::before {
+  content: '🔓';
+}
+
+.action-button i.markdown::before {
+  content: '📝';
+}
+
+.action-button i.connect::before {
+  content: '🔌';
+}
+
+.action-button i.disconnect::before {
+  content: '🔌';
+}
 </style>

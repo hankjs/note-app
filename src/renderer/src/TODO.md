@@ -3,23 +3,15 @@
 ## 转化文件
 
 - [ ] App.tsx
-- [x] appSettings.ts // appSettings.ts
 - [ ] collaboration.ts
 - [ ] commenting
 - [ ] └── index.ts
 - [ ] context
-- [x] ├── FlashMessageContext.tsx
+- [x] ├── FlashMessageContext.tsx // components/ui/FlashMessage/useFlashMessage.ts
 - [ ] ├── SettingsContext.tsx
 - [ ] ├── SharedHistoryContext.tsx
 - [ ] └── ToolbarContext.tsx
 - [ ] Editor.tsx
-- [ ] hooks
-- [x] ├── useFlashMessage.tsx
-- [x] ├── useModal.tsx
-- [ ] └── useReport.ts
-- [x] images // images
-- [x] index.css // assets/index.css
-- [x] index.tsx // main.ts
 - [ ] nodes
 - [ ] ├── AutocompleteNode.tsx
 - [ ] ├── DateTimeNode
@@ -55,8 +47,8 @@
 - [ ] ├── TweetNode.tsx
 - [ ] └── YouTubeNode.tsx
 - [ ] plugins
-- [ ] ├── ActionsPlugin
-- [ ] │   └── index.tsx
+- [-] ├── ActionsPlugin
+- [ ] │   └── index.tsx // plugins/ActionsPlugin/index.vue
 - [ ] ├── AutocompletePlugin
 - [ ] │   └── index.tsx
 - [ ] ├── AutoEmbedPlugin
@@ -188,6 +180,10 @@
 - [ ] ├── StickyEditorTheme.css
 - [ ] └── StickyEditorTheme.ts
 - [ ] ui
+- [x] ├── FlashMessage.css // components/ui/FlashMessage/index.vue
+- [x] ├── FlashMessage.tsx // components/ui/FlashMessage/index.vue
+- [x] ├── Modal.css // components/ui/Modal/index.vue
+- [x] ├── Modal.tsx // components/ui/Modal/index.vue
 - [ ] ├── Button.css
 - [ ] ├── Button.tsx
 - [ ] ├── ColorPicker.css
@@ -203,20 +199,24 @@
 - [ ] ├── ExcalidrawModal.css
 - [ ] ├── ExcalidrawModal.tsx
 - [ ] ├── FileInput.tsx
-- [x] ├── FlashMessage.css
-- [x] ├── FlashMessage.tsx
 - [ ] ├── ImageResizer.tsx
 - [ ] ├── Input.css
 - [ ] ├── KatexEquationAlterer.css
 - [ ] ├── KatexEquationAlterer.tsx
 - [ ] ├── KatexRenderer.tsx
-- [x] ├── Modal.css
-- [x] ├── Modal.tsx
 - [ ] ├── Select.css
 - [ ] ├── Select.tsx
 - [ ] ├── Switch.tsx
 - [ ] └── TextInput.tsx
-- [x] utils
+- [x] index.css // assets/index.css
+- [x] index.tsx // main.ts
+- [x] appSettings.ts // appSettings.ts
+- [x] hooks/
+- [x] ├── useFlashMessage.tsx // composables/useFlashMessage.ts
+- [x] ├── useModal.tsx // composables/useModal.ts
+- [x] └── useReport.ts // composables/useReport.ts
+- [x] images/ // images/
+- [x] utils/
 - [x]    ├── docSerialization.ts
 - [x]    ├── emoji-list.ts
 - [x]    ├── getDOMRangeRect.ts

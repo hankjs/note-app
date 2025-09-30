@@ -12,7 +12,7 @@
         ref="modalRef"
         @click.stop
       >
-        <h2 class="Modal__title">{{ title }}</h2>
+        <h2 class="Modal__title">{{ innerTitle }}</h2>
         <button
           class="Modal__closeButton"
           aria-label="Close modal"
@@ -22,7 +22,7 @@
           X
         </button>
         <div class="Modal__content">
-          <slot />
+          <slot :isVisible="isVisible" :onClose="handleClose" />
         </div>
       </div>
     </div>
@@ -31,20 +31,21 @@
 
 <script lang="ts">
 export interface Props {
-  title: string
+  title?: string
   closeOnClickOutside?: boolean
   modelValue?: boolean
 }
 
 export interface Emits {
   (e: 'update:modelValue', value: boolean): void
+  (e: 'update:title', value: string): void
   (e: 'close'): void
 }
 </script>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
-
+import { useInner } from '@/composables/useInner'
 
 const props = withDefaults(defineProps<Props>(), {
   closeOnClickOutside: false,
@@ -55,6 +56,7 @@ const emit = defineEmits<Emits>()
 
 const modalRef = ref<HTMLElement | null>(null)
 const isVisible = ref(props.modelValue)
+const innerTitle = useInner(props, 'title', emit)
 
 // 關閉 modal
 const handleClose = () => {
@@ -85,7 +87,12 @@ const focusModal = async () => {
   }
 }
 
-const show = () => {
+const show = (title?: string) => {
+  console.log('show', title)
+  if (title) {
+    innerTitle.value = title
+  }
+
   isVisible.value = true
   emit('update:modelValue', true)
 }
@@ -116,7 +123,7 @@ defineExpose({
 })
 </script>
 
-<style scoped>
+<style>
 .Modal__overlay {
   display: flex;
   justify-content: center;
