@@ -41,7 +41,7 @@ export function useLexicalEditorSetup(
     setContent,
     setError,
     cleanup: contextCleanup,
-    addCleanup
+    onCleanup
   } = context
 
   const editorRef = ref<HTMLElement>()
@@ -113,7 +113,7 @@ export function useLexicalEditorSetup(
       // 使用 context 方法设置编辑器实例
       setEditor(instance)
       // 添加清理函数
-      addCleanup(cleanup)
+      onCleanup(cleanup)
       // 清除错误状态
       setError(null)
     } catch (error) {

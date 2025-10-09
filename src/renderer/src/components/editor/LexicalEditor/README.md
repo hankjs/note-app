@@ -78,7 +78,7 @@ const handleChange = (value) => {
 - `setError()`: 设置错误
 - `updateEditorState()`: 更新编辑器状态
 - `cleanup()`: 清理资源
-- `addCleanup()`: 添加清理函数
+- `onCleanup()`: 添加清理函数
 
 ## 组件结构
 

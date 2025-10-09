@@ -192,26 +192,26 @@ describe('useLexicalContext', () => {
     })
 
     it('應該添加清理函數', () => {
-      const { addCleanup } = useSetup(() => {
+      const { onCleanup } = useSetup(() => {
         return useLexicalContext()
       })
 
       const cleanupFn = vi.fn()
-      addCleanup(cleanupFn)
+      onCleanup(cleanupFn)
 
       // 清理函數應該被存儲，但不會立即執行
       expect(cleanupFn).not.toHaveBeenCalled()
     })
 
     it('應該在清理時執行所有清理函數', () => {
-      const { addCleanup, cleanup } = useSetup(() => {
+      const { onCleanup, cleanup } = useSetup(() => {
         return useLexicalContext()
       })
 
       const cleanupFn1 = vi.fn()
       const cleanupFn2 = vi.fn()
-      addCleanup(cleanupFn1)
-      addCleanup(cleanupFn2)
+      onCleanup(cleanupFn1)
+      onCleanup(cleanupFn2)
 
       cleanup()
 
@@ -283,12 +283,12 @@ describe('useLexicalContext', () => {
     })
 
     it('應該在設置新編輯器時重新創建監聽器管理器', () => {
-      const { setEditor, addCleanup } = useSetup(() => {
+      const { setEditor, onCleanup } = useSetup(() => {
         return useLexicalContext()
       })
 
       const cleanupFn = vi.fn()
-      addCleanup(cleanupFn)
+      onCleanup(cleanupFn)
 
       setEditor(realEditor)
 

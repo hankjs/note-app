@@ -1,4 +1,4 @@
-import { ref, onUnmounted } from 'vue'
+import { defineComponent, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import type { LexicalCommand, LexicalEditor, RangeSelection } from 'lexical'
 import {
   $getSelection,
@@ -8,17 +8,12 @@ import {
   REDO_COMMAND,
   UNDO_COMMAND,
 } from 'lexical'
+import { useLexicalEditor } from '@/composables/useLexicalContext'
+import { useReport } from '@/composables/useReport'
 
-export const SPEECH_TO_TEXT_COMMAND: LexicalCommand<boolean> = createCommand(
-  'SPEECH_TO_TEXT_COMMAND',
-)
+export const SPEECH_TO_TEXT_COMMAND: LexicalCommand<boolean> = createCommand('SPEECH_TO_TEXT_COMMAND')
 
-const VOICE_COMMANDS: Readonly<
-  Record<
-    string,
-    (arg0: { editor: LexicalEditor; selection: RangeSelection }) => void
-  >
-> = {
+const VOICE_COMMANDS: Readonly<Record<string, (args: { editor: LexicalEditor; selection: RangeSelection }) => void>> = {
   '\n': ({ selection }) => {
     selection.insertParagraph()
   },
@@ -31,83 +26,99 @@ const VOICE_COMMANDS: Readonly<
 }
 
 export const SUPPORT_SPEECH_RECOGNITION: boolean =
-  'SpeechRecognition' in window || 'webkitSpeechRecognition' in window
+  typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
 
-// Vue 3 composable for speech to text functionality
-export function useSpeechToText(editor: LexicalEditor) {
-  const isEnabled = ref(false)
-  const SpeechRecognition =
-    // @ts-expect-error missing type
-    window.SpeechRecognition || window.webkitSpeechRecognition
-  const recognition = ref<typeof SpeechRecognition | null>(null)
+const SpeechToTextPlugin = defineComponent({
+  name: 'SpeechToTextPlugin',
+  setup() {
+    const { editor, onCleanup } = useLexicalEditor()
+    type ReportFn = (content: string) => ReturnType<typeof setTimeout>
+    const report = useReport() as ReportFn
+    const isEnabled = ref(false)
+    const SpeechRecognitionCtor: any =
+      (typeof window !== 'undefined' && (window as any).SpeechRecognition) ||
+      (typeof window !== 'undefined' && (window as any).webkitSpeechRecognition)
+    const recognition = ref<any | null>(null)
 
-  const startRecognition = () => {
-    if (!recognition.value) {
-      recognition.value = new SpeechRecognition()
-      recognition.value.continuous = true
-      recognition.value.interimResults = true
-      recognition.value.addEventListener(
-        'result',
-        (event: typeof SpeechRecognition) => {
+    function ensureRecognition() {
+      if (!recognition.value && SpeechRecognitionCtor) {
+        recognition.value = new SpeechRecognitionCtor()
+        recognition.value.continuous = true
+        recognition.value.interimResults = true
+        recognition.value.addEventListener('result', (event: any) => {
           const resultItem = event.results.item(event.resultIndex)
           const { transcript } = resultItem.item(0)
+          report(transcript)
 
           if (!resultItem.isFinal) {
             return
           }
 
-          editor.update(() => {
-            const selection = $getSelection()
+          const ed = editor.value
+          if (!ed) return
 
+          ed.update(() => {
+            const selection = $getSelection()
             if ($isRangeSelection(selection)) {
               const command = VOICE_COMMANDS[transcript.toLowerCase().trim()]
-
               if (command) {
-                command({
-                  editor,
-                  selection,
-                })
-              } else if (transcript.match(/\s*\n\s*/)) {
+                command({ editor: ed, selection })
+              } else if (/\s*\n\s*/.test(transcript)) {
                 selection.insertParagraph()
               } else {
                 selection.insertText(transcript)
               }
             }
           })
+        })
+      }
+    }
+
+    function startIfReady() {
+      if (SUPPORT_SPEECH_RECOGNITION && isEnabled.value) {
+        ensureRecognition()
+        recognition.value?.start?.()
+      }
+    }
+
+    function stopIfAny() {
+      recognition.value?.stop?.()
+    }
+
+    onMounted(() => {
+      if (!editor.value) return
+
+      const unregister = editor.value.registerCommand(
+        SPEECH_TO_TEXT_COMMAND,
+        (enabled: boolean) => {
+          isEnabled.value = enabled
+          return true
         },
+        COMMAND_PRIORITY_EDITOR,
       )
-    }
 
-    if (isEnabled.value) {
-      recognition.value.start()
-    } else {
-      recognition.value.stop()
-    }
-  }
+      onCleanup(unregister)
 
-  const stopRecognition = () => {
-    if (recognition.value) {
-      recognition.value.stop()
-    }
-  }
+      const stopWatch = watch(
+        () => isEnabled.value,
+        (enabled) => {
+          if (enabled) startIfReady()
+          else stopIfAny()
+        },
+        { immediate: true },
+      )
 
-  const toggleRecognition = (enabled: boolean) => {
-    isEnabled.value = enabled
-    if (enabled) {
-      startRecognition()
-    } else {
-      stopRecognition()
-    }
-  }
+      onCleanup(() => stopWatch())
+    })
 
-  onUnmounted(() => {
-    stopRecognition()
-  })
+    onBeforeUnmount(() => {
+      stopIfAny()
+    })
 
-  return {
-    isEnabled,
-    toggleRecognition,
-    startRecognition,
-    stopRecognition,
-  }
-}
+    return () => null
+  },
+})
+
+export default (SUPPORT_SPEECH_RECOGNITION ? SpeechToTextPlugin : defineComponent({ name: 'SpeechToTextPluginDisabled', setup: () => () => null }))
+
+

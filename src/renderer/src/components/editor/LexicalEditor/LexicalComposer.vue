@@ -51,7 +51,7 @@ defineExpose<LexicalContext>({
   setError: lexicalContext.setError,
   updateEditorState: lexicalContext.updateEditorState,
   cleanup: lexicalContext.cleanup,
-  addCleanup: lexicalContext.addCleanup
+  onCleanup: lexicalContext.onCleanup
 })
 </script>
 

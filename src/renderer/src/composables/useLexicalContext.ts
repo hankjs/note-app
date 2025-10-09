@@ -2,9 +2,9 @@ import { ref, shallowRef, provide, inject, type Ref } from 'vue'
 import type { LexicalEditor } from 'lexical'
 import type { LexicalEditorConfig } from '@/types/lexical'
 
-type UnmountListeners = () => void;
+type listenerHandler = () => void;
 
-type ListenerManager = Map<string, UnmountListeners>
+type ListenerManager = Map<string, listenerHandler>
 let _uid = 0
 
 // 定义 Lexical 上下文的接口
@@ -34,7 +34,8 @@ export interface LexicalContext {
   setError: (error: Error | null) => void
   updateEditorState: (state: any) => void
   cleanup: () => void
-  addCleanup: (cleanup: () => void) => void
+  onCleanup: (cleanup: listenerHandler) => void
+  onEditorCreated: (callback: listenerHandler) => void
 }
 
 // 提供 Lexical 上下文的 key
@@ -59,6 +60,7 @@ export function useLexicalContext() {
 
   // 监听器管理器
   const listenerManager = ref<ListenerManager>(new Map())
+  const editorInitedManager = useEditorInited()
 
   const updateEditorState = (state: any) => {
     editorState.value = state
@@ -83,6 +85,8 @@ export function useLexicalContext() {
       const state = instance.parseEditorState(content.value);
       instance.setEditorState(state);
     }
+
+    editorInitedManager.trigger()
   }
   
   const setContent = (newContent: string) => {
@@ -112,8 +116,12 @@ export function useLexicalContext() {
     setError(null)
   }
   
-  const addCleanup = (cleanup: () => void) => {
+  const onCleanup = (cleanup: () => void) => {
     listenerManager.value.set(`cleanup-${_uid++}`, cleanup)
+  }
+
+  const onEditorCreated = (callback: listenerHandler) => {
+    editorInitedManager.addListener(callback)
   }
   
   // 创建上下文对象
@@ -130,10 +138,41 @@ export function useLexicalContext() {
     setError,
     updateEditorState,
     cleanup,
-    addCleanup
+    onCleanup,
+    onEditorCreated
   }
   
   return context
+}
+
+let _initedId = 0
+export function useEditorInited() {
+  // 监听器管理器
+  const manager = ref<ListenerManager>(new Map())
+
+  const addListener = (listener: listenerHandler) => {
+    const id = `editor-inited-${_initedId++}`
+    manager.value.set(id, listener)
+
+    return id
+  }
+
+  const removeListener = (id: string) => {
+    manager.value.delete(id)
+  }
+
+  const trigger = () => {
+    manager.value.forEach((listener) => {
+      listener()
+    })
+  }
+
+  return {
+    manager,
+    addListener,
+    removeListener,
+    trigger
+  }
 }
 
 // 提供 Lexical 上下文
@@ -154,19 +193,5 @@ export function injectLexicalContext(): LexicalContext {
 // 便捷的 composable 用于在子组件中获取上下文
 export function useLexicalEditor() {
   const context = injectLexicalContext()
-  return {
-    editor: context.editor,
-    config: context.config,
-    content: context.content,
-    editorState: context.editorState,
-    isInitialized: context.isInitialized,
-    error: context.error,
-    setEditor: context.setEditor,
-    setContent: context.setContent,
-    setConfig: context.setConfig,
-    setError: context.setError,
-    updateEditorState: context.updateEditorState,
-    cleanup: context.cleanup,
-    addCleanup: context.addCleanup
-  }
+  return context
 }
