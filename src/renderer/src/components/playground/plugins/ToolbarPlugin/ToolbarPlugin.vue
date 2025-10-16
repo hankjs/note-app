@@ -623,7 +623,7 @@ const { modal, showModal } = useModal()
             <i class="icon capitalize" />
             <span class="text">Capitalize</span>
           </div>
-          <span class="shortcut">{SHORTCUTS.CAPITALIZE}</span>
+          <span class="shortcut">{{ SHORTCUTS.CAPITALIZE }}</span>
         </DropDownItem>
         <DropDownItem
           @click="dispatchFormatTextCommand('strikethrough', isKeyboardInput($event))"
