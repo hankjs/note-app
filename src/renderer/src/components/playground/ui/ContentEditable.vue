@@ -23,7 +23,7 @@ defineProps<{
   </LexicalContentEditable>
 </template>
 
-<style scoped>
+<style>
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *

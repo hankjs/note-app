@@ -32,7 +32,7 @@ useEffect(() => {
     },
     COMMAND_PRIORITY_EDITOR,
   );
-}, [editor]);
+}, [() => editor]);
 </script>
 
 <template>

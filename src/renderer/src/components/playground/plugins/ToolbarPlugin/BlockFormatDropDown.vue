@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { dropDownActiveClass, rootTypeToRootName } from "./index.shared"
+import { dropDownActiveClass, rootTypeToRootName } from "./ToolbarPlugin.shared"
 import DropDown from "../../ui/DropDown.vue"
 import DropDownItem from "../../ui/DropDownItem.vue"
 import { blockTypeToBlockName } from "../../composables/useToolbarState"

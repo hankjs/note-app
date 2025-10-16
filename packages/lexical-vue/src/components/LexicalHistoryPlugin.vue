@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { HistoryState } from '@lexical/history'
-import { useHistory, useLexicalComposer } from '../composables'
+import type { HistoryState } from "@lexical/history"
+import { useHistory, useLexicalComposer } from "../composables"
 
 const props = defineProps<{
   delay?: number
@@ -8,7 +8,13 @@ const props = defineProps<{
 }>()
 
 const editor = useLexicalComposer()
-useHistory(editor, () => props.externalHistoryState, () => props.delay)
+useHistory(
+  editor,
+  () => props.externalHistoryState,
+  () => props.delay
+)
 </script>
 
-<template />
+<template>
+  <slot />
+</template>

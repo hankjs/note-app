@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ElementFormatType, type LexicalEditor, FORMAT_ELEMENT_COMMAND, OUTDENT_CONTENT_COMMAND, INDENT_CONTENT_COMMAND } from 'lexical'
-import { ELEMENT_FORMAT_OPTIONS } from './index.shared'
+import { ELEMENT_FORMAT_OPTIONS } from './ToolbarPlugin.shared'
 import DropDown from '../../ui/DropDown.vue'
 import DropDownItem from '../../ui/DropDownItem.vue'
 import { SHORTCUTS } from '../ShortcutsPlugin/shortcuts'

@@ -7,7 +7,7 @@ import LexicalContentEditableElement from './LexicalContentEditableElement.vue'
 
 type ContentEditableProps = Omit<ElementProps, 'editor' | 'placeholder'>
 
-withDefaults(defineProps<ContentEditableProps>(), {
+withDefaults(defineProps<ContentEditableProps & { placeholder?: string }>(), {
   role: 'textbox',
   spellcheck: true,
 })

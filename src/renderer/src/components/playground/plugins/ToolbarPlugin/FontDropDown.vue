@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { $patchStyleText } from "@lexical/selection"
 import { $addUpdateTag, $getSelection, SKIP_SELECTION_FOCUS_TAG, type LexicalEditor } from "lexical"
-import { dropDownActiveClass, FONT_FAMILY_OPTIONS, FONT_SIZE_OPTIONS } from "./index.shared"
+import { dropDownActiveClass, FONT_FAMILY_OPTIONS, FONT_SIZE_OPTIONS } from "./ToolbarPlugin.shared"
 import DropDown from "../../ui/DropDown.vue"
 import DropDownItem from "../../ui/DropDownItem.vue"
 

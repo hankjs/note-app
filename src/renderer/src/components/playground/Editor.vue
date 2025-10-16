@@ -15,7 +15,7 @@ import {
 import EmojisPlugin from "./plugins/EmojisPlugin.vue"
 import EmojiPickerPlugin from "./plugins/EmojiPickerPlugin.vue"
 import TreeViewPlugin from "./plugins/TreeViewPlugin.vue"
-import ToolbarPlugin from "./plugins/ToolbarPlugin/index.vue"
+import ToolbarPlugin from "./plugins/ToolbarPlugin/ToolbarPlugin.vue"
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin.vue"
 import ListMaxIndentLevelPlugin from "./plugins/ListMaxIndentLevelPlugin.vue"
 import AutoLinkPlugin from "./plugins/AutoLinkPlugin.vue"
@@ -69,58 +69,58 @@ const {
 </script>
 
 <template>
-  <TablePluginComposer>
-    <ToolbarPlugin
-      v-model:activeEditor="activeEditor"
-      :editor="editor"
-    />
-    <div class="editor-container">
-      <div className="editor-inner">
-        <LexicalRichTextPlugin>
-          <template #contentEditable>
-            <div class="editor-scroller">
-              <div class="editor">
-                <ContentEditable />
+  <LexicalHistoryPlugin>
+    <TablePluginComposer>
+      <ToolbarPlugin
+        v-model:activeEditor="activeEditor"
+      />
+      <div class="editor-container">
+        <div className="editor-inner">
+          <LexicalRichTextPlugin>
+            <template #contentEditable>
+              <div class="editor-scroller">
+                <div class="editor">
+                  <ContentEditable />
+                </div>
               </div>
-            </div>
-          </template>
-          <template #placeholder>
-            <div class="editor-placeholder">Enter some text...</div>
-          </template>
-        </LexicalRichTextPlugin>
-        <LexicalTablePlugin
-          :hasCellMerge="tableCellMerge"
-          :hasCellBackgroundColor="tableCellBackgroundColor"
-          :hasHorizontalScroll="tableHorizontalScroll"
-        />
-        <LexicalHistoryPlugin />
-        <AutoEmbedPlugin />
-        <TreeViewPlugin />
-        <LexicalAutoFocusPlugin />
-        <CodeHighlightPlugin />
-        <LexicalListPlugin />
-        <LexicalCheckListPlugin />
-        <LexicalLinkPlugin />
-        <AutoLinkPlugin />
-        <ListMaxIndentLevelPlugin :max-depth="7" />
-        <LexicalHashtagPlugin />
-        <MarkdownShortcutPlugin />
-        <EmojiPickerPlugin />
-        <EmojisPlugin />
-        <MentionsPlugin />
-        <LexicalClickableLinkPlugin />
-        <YouTubePlugin />
-        <TwitterPlugin />
-        <FloatingLinkEditor :priority="1" />
-        <PageBreakPlugin />
-        <ImagesPlugin />
-        <ExcalidrawPlugin />
-        <PollPlugin />
-        <LayoutPlugin />
-        <EquationsPlugin />
-        <CollapsiblePlugin />
-        <!-- <DateTimePlugin /> -->
+            </template>
+            <template #placeholder>
+              <div class="editor-placeholder">Enter some text...</div>
+            </template>
+          </LexicalRichTextPlugin>
+          <LexicalTablePlugin
+            :hasCellMerge="tableCellMerge"
+            :hasCellBackgroundColor="tableCellBackgroundColor"
+            :hasHorizontalScroll="tableHorizontalScroll"
+          />
+          <AutoEmbedPlugin />
+          <TreeViewPlugin />
+          <LexicalAutoFocusPlugin />
+          <CodeHighlightPlugin />
+          <LexicalListPlugin />
+          <LexicalCheckListPlugin />
+          <LexicalLinkPlugin />
+          <AutoLinkPlugin />
+          <ListMaxIndentLevelPlugin :max-depth="7" />
+          <LexicalHashtagPlugin />
+          <MarkdownShortcutPlugin />
+          <EmojiPickerPlugin />
+          <EmojisPlugin />
+          <MentionsPlugin />
+          <LexicalClickableLinkPlugin />
+          <YouTubePlugin />
+          <TwitterPlugin />
+          <FloatingLinkEditor :priority="1" />
+          <PageBreakPlugin />
+          <ImagesPlugin />
+          <ExcalidrawPlugin />
+          <PollPlugin />
+          <LayoutPlugin />
+          <EquationsPlugin />
+          <CollapsiblePlugin />
+          <!-- <DateTimePlugin /> -->
+        </div>
       </div>
-    </div>
-  </TablePluginComposer>
+    </TablePluginComposer>
+  </LexicalHistoryPlugin>
 </template>

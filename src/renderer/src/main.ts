@@ -7,7 +7,6 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 
-console.log('main')
 // Handle runtime errors
 const showErrorOverlay = (err: Event) => {
   const ErrorOverlay = customElements.get('vite-error-overlay');

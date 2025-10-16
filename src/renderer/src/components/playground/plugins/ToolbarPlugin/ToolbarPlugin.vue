@@ -65,7 +65,7 @@ import {
   CODE_LANGUAGE_OPTIONS_SHIKI,
   CODE_THEME_OPTIONS_SHIKI,
   $findTopLevelElement
-} from "./index.shared"
+} from "./ToolbarPlugin.shared"
 import { isKeyboardInput } from "../../utils/focusUtils"
 import { parseFontSizeForToolbar } from "./FontSize.shared"
 import { SHORTCUTS } from "../ShortcutsPlugin/shortcuts"

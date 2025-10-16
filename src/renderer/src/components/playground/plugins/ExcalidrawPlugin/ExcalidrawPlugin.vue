@@ -31,7 +31,7 @@ useEffect(() => {
     },
     COMMAND_PRIORITY_EDITOR
   )
-}, [editor])
+}, [() => editor])
 
 const onClose = () => {
   isModalOpen.value = false
