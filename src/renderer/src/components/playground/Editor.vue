@@ -124,3 +124,5 @@ const {
     </TablePluginComposer>
   </LexicalHistoryPlugin>
 </template>
+
+<style src="./assets/style.css"></style>

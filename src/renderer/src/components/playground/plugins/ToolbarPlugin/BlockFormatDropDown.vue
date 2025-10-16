@@ -38,7 +38,7 @@ withDefaults(
   >
     <DropDownItem
       :class="`item wide ${dropDownActiveClass(blockType === 'paragraph')}`"
-      @click="() => formatParagraph(editor)"
+      @click="formatParagraph(editor)"
     >
       <div className="icon-text-container">
         <i class="icon paragraph" />
@@ -78,7 +78,7 @@ withDefaults(
     </DropDownItem>
     <DropDownItem
       :class="`item wide ${dropDownActiveClass(blockType === 'number')}`"
-      @click="formatNumberedList"
+      @click="formatNumberedList(editor, blockType)"
     >
       <div className="icon-text-container">
         <i className="icon numbered-list" />
@@ -88,7 +88,7 @@ withDefaults(
     </DropDownItem>
     <DropDownItem
       :class="`item wide ${dropDownActiveClass(blockType === 'bullet')}`"
-      @click="formatBulletList"
+      @click="formatBulletList(editor, blockType)"
     >
       <div className="icon-text-container">
         <i className="icon bullet-list" />
@@ -98,7 +98,7 @@ withDefaults(
     </DropDownItem>
     <DropDownItem
       :class="`item wide ${dropDownActiveClass(blockType === 'check')}`"
-      @click="formatCheckList"
+      @click="formatCheckList(editor, blockType)"
     >
       <div className="icon-text-container">
         <i className="icon check-list" />
@@ -108,7 +108,7 @@ withDefaults(
     </DropDownItem>
     <DropDownItem
       :class="`item wide ${dropDownActiveClass(blockType === 'quote')}`"
-      @click="formatQuote"
+      @click="formatQuote(editor, blockType)"
     >
       <div className="icon-text-container">
         <i className="icon quote" />
@@ -118,7 +118,7 @@ withDefaults(
     </DropDownItem>
     <DropDownItem
       :class="`item wide ${dropDownActiveClass(blockType === 'code')}`"
-      @click="formatCode"
+      @click="formatCode(editor, blockType)"
     >
       <div className="icon-text-container">
         <i className="icon code" />

@@ -1,5 +1,5 @@
 // import './assets/main.css'
-// import './assets/index.css'
+import './assets/index.css'
 import './components/playground/assets/style.css'
 import 'uno.css'
 
