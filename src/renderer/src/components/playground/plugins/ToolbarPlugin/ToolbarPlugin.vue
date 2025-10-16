@@ -811,7 +811,7 @@ const { modal, showModal } = useModal()
           <DropDownItem
             @click="
               () => {
-                editor.update(() => {
+                activeEditorRef.update(() => {
                   $addUpdateTag(SKIP_SELECTION_FOCUS_TAG)
                   const root = $getRoot()
                   const stickyNode = $createStickyNode(0, 0)

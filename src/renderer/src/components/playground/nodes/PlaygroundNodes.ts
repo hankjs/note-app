@@ -19,6 +19,7 @@ import { EquationNode } from './EquationNode/EquationNode'
 import { CollapsibleContentNode } from '../plugins/CollapsiblePlugin/CollapsibleContentNode'
 import { CollapsibleContainerNode } from '../plugins/CollapsiblePlugin/CollapsibleContainerNode'
 import { CollapsibleTitleNode } from '../plugins/CollapsiblePlugin/CollapsibleTitleNode'
+import { StickyNode } from './StickyNode/StickyNode'
 
 const PlaygroundNodes: Array<Klass<LexicalNode>> = [
   HeadingNode,
@@ -48,6 +49,7 @@ const PlaygroundNodes: Array<Klass<LexicalNode>> = [
   CollapsibleContainerNode,
   CollapsibleContentNode,
   CollapsibleTitleNode,
+  StickyNode,
 ]
 
 export default PlaygroundNodes
