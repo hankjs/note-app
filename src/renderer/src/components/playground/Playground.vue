@@ -10,6 +10,7 @@ import PlaygroundEditorTheme from './themes/PlaygroundEditorTheme'
 import PlaygroundNodes from './nodes/PlaygroundNodes'
 import ToolbarPluginComposer from './plugins/ToolbarPlugin/ToolbarPluginComposer.vue'
 import AppSetting from './plugins/AppSetting.vue'
+import Settings from './ui/Settings.vue'
 
 function prepopulatedRichText() {
   const root = $getRoot()
@@ -117,6 +118,7 @@ function onError(error: Error) {
         <div class="editor-shell">
           <Editor />
         </div>
+        <Settings />
       </ToolbarPluginComposer>
     </LexicalComposer>
   </AppSetting>
