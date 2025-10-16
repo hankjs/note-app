@@ -1,0 +1,14 @@
+{
+  "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
+  "include": [
+    "vite-env.d.ts",
+    "src/renderer/src/env.d.ts",
+    "src/preload/*.d.ts",
+    "packages/lexical-vue/src/**/*",
+    "packages/lexical-vue/src/**/*.vue",
+    "packages/shared/src/**/*",
+  ],
+  "compilerOptions": {
+    "composite": true,
+  }
+}

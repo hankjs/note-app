@@ -1,16 +1,22 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
   "include": [
+    "vite-env.d.ts",
     "src/renderer/src/env.d.ts",
+    "src/renderer/src/veaury.d.ts",
     "src/renderer/src/**/*",
     "src/renderer/src/**/*.vue",
     "src/preload/*.d.ts",
-    "test/**/*"
+    "test/**/*",
   ],
   "compilerOptions": {
     "composite": true,
     "baseUrl": ".",
+    "moduleResolution": "bundler",
     "paths": {
+      "@playground/*": [
+        "src/renderer/playground/*"
+      ],
       "@renderer/*": [
         "src/renderer/src/*"
       ],

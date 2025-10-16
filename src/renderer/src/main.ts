@@ -1,18 +1,20 @@
-import './assets/main.css'
-import './assets/index.css'
+// import './assets/main.css'
+// import './assets/index.css'
+import './components/playground/assets/style.css'
 import 'uno.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 
+console.log('main')
 // Handle runtime errors
 const showErrorOverlay = (err: Event) => {
   const ErrorOverlay = customElements.get('vite-error-overlay');
   if (!ErrorOverlay) {
     return;
   }
-  const overlay = new ErrorOverlay(err);
+  const overlay = new ErrorOverlay(err || 'Unknown error');
   const body = document.body;
   if (body !== null) {
     body.appendChild(overlay);
@@ -29,3 +31,4 @@ const pinia = createPinia()
 
 app.use(pinia)
 app.mount('#app')
+console.log('app mounted')

@@ -1,0 +1,1 @@
+目前 react 用到了 @floating-ui/react，但是 vue 没有对应的包，所以需要找到一个 vue 的替代品。

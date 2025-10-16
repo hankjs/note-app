@@ -1,0 +1,71 @@
+{
+  "name": "lexical-vue",
+  "type": "module",
+  "version": "0.11.0",
+  "packageManager": "pnpm@9.15.4",
+  "description": "An extensible Vue 3 web text-editor based on Lexical.",
+  "author": "Robert Soriano <sorianorobertc@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/wobsoriano/lexical-vue#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wobsoriano/lexical-vue.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wobsoriano/lexical-vue/issues"
+  },
+  "keywords": [
+    "vue",
+    "lexical",
+    "editor",
+    "rich-text"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./src/*",
+        "./*"
+      ]
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "dependencies": {
+    "@lexical/clipboard": "catalog:",
+    "@lexical/code": "catalog:",
+    "@lexical/dragon": "catalog:",
+    "@lexical/hashtag": "catalog:",
+    "@lexical/history": "catalog:",
+    "@lexical/html": "catalog:",
+    "@lexical/link": "catalog:",
+    "@lexical/list": "catalog:",
+    "@lexical/mark": "catalog:",
+    "@lexical/markdown": "catalog:",
+    "@lexical/overflow": "catalog:",
+    "@lexical/plain-text": "catalog:",
+    "@lexical/rich-text": "catalog:",
+    "@lexical/selection": "catalog:",
+    "@lexical/table": "catalog:",
+    "@lexical/text": "catalog:",
+    "@lexical/utils": "catalog:",
+    "@lexical/yjs": "catalog:",
+    "lexical": "catalog:",
+    "tiny-invariant": "catalog:",
+    "vue": "catalog:",
+    "yjs": "catalog:",
+    "shared": "workspace:*"
+  }
+}

@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
-import vue from '@vitejs/plugin-vue'
 import UnoCSS from 'unocss/vite'
+import veaury from 'veaury/vite/index.js';
 
 export default defineConfig({
   main: {
@@ -14,9 +14,19 @@ export default defineConfig({
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src'),
-        '@': resolve('src/renderer/src')
+        '@': resolve('src/renderer/src'),
       }
     },
-    plugins: [vue(), UnoCSS()]
+    plugins: [
+      // react in vue
+      veaury({
+        type: 'vue',
+      }),
+      // vue(),
+      UnoCSS()
+    ],
+      define: {
+        'process.env.IS_PREACT': JSON.stringify('true'),
+      },
   }
 })
