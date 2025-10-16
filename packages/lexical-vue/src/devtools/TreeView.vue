@@ -144,7 +144,7 @@ const handleExportModeToggleClick = () => {
 </script>
 
 <template>
-  <div class="{viewClassName}">
+  <div :class="viewClassName">
     <div
       v-if="!showLimited && isLimited"
       :style="{ padding: 20 }"
@@ -198,7 +198,7 @@ const handleExportModeToggleClick = () => {
     </pre>
     <div
       v-if="timeTravelEnabled && (showLimited || !isLimited)"
-      class="{timeTravelPanelClassName}"
+      :class="timeTravelPanelClassName"
     >
       <button
         :class="timeTravelPanelButtonClassName"

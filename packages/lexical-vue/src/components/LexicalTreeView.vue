@@ -89,22 +89,22 @@ const handleEditorReadOnly = (isReadonly: boolean) => {
 
 <template>
   <TreeViewCore
-    :treeTypeButtonClassName="treeTypeButtonClassName"
-    :timeTravelButtonClassName="timeTravelButtonClassName"
-    :timeTravelPanelSliderClassName="timeTravelPanelSliderClassName"
-    :timeTravelPanelButtonClassName="timeTravelPanelButtonClassName"
-    :viewClassName="viewClassName"
-    :timeTravelPanelClassName="timeTravelPanelClassName"
-    :setEditorReadOnly="handleEditorReadOnly"
-    :editorState="editorCurrentState"
-    @setEditorState="(state) => editor.setEditorState(state)"
-    :generateContent="
+    :tree-type-button-class-name="treeTypeButtonClassName"
+    :time-travel-button-class-name="timeTravelButtonClassName"
+    :time-travel-panel-slider-class-name="timeTravelPanelSliderClassName"
+    :time-travel-panel-button-class-name="timeTravelPanelButtonClassName"
+    :view-class-name="viewClassName"
+    :time-travel-panel-class-name="timeTravelPanelClassName"
+    :set-editor-read-only="handleEditorReadOnly"
+    :editor-state="editorCurrentState"
+    @set-editor-state="(state) => editor.setEditorState(state)"
+    :generate-content="
       async (exportDOM) => {
         // Generates the content for the tree view, allowing customization with exportDOM and customPrintNode
         return generateContent(editor, commandsLog, exportDOM, customPrintNode)
       }
     "
     ref="treeElementRef"
-    :commandsLog="commandsLog"
+    :commands-log="commandsLog"
   />
 </template>
