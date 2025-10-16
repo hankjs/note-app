@@ -851,7 +851,7 @@ const { modal, showModal } = useModal()
             @click="() => dispatchToolbarCommand(INSERT_EMBED_COMMAND, embedConfig.type)"
             class="item"
           >
-            {{ embedConfig.icon }}
+            <component :is="embedConfig.icon" />
             <span class="text">{{ embedConfig.contentName }}</span>
           </DropDownItem>
         </DropDown>
