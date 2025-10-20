@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ExcalidrawElement, NonDeleted } from "@excalidraw/excalidraw/element/types"
-import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types"
+import type { AppState, BinaryFiles, LibraryItem_v1 } from "@excalidraw/excalidraw/types"
 import { computed, CSSProperties, ref } from "vue"
 import { useEffect } from "../../composables/useEffect"
 import { exportToSvg } from "@excalidraw/excalidraw"
@@ -20,7 +19,7 @@ const props = defineProps<{
   /**
    * The Excalidraw elements to be rendered as an image
    */
-  elements: NonDeleted<ExcalidrawElement>[] | ExcalidrawInitialElements
+  elements: LibraryItem_v1[] | ExcalidrawInitialElements
   /**
    * The Excalidraw files associated with the elements
    */
