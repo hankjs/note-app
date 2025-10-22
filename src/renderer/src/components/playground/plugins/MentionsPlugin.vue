@@ -7,70 +7,70 @@ import type { Component } from 'vue'
 import { computed, h, ref, watch } from 'vue'
 import { $createMentionNode } from '../nodes/MentionNode'
 
-const PUNCTUATION
-  = '\\.,\\+\\*\\?\\$\\@\\|#{}\\(\\)\\^\\-\\[\\]\\\\/!%\'"~=<>_:;'
-const NAME = `\\b[A-Z][^\\s${PUNCTUATION}]`
+const PUNCTUATION =
+  '\\.,\\+\\*\\?\\$\\@\\|#{}\\(\\)\\^\\-\\[\\]\\\\/!%\'"~=<>_:;';
+const NAME = '\\b[A-Z][^\\s' + PUNCTUATION + ']';
 
 const DocumentMentionsRegex = {
   NAME,
   PUNCTUATION,
-}
+};
 
-const PUNC = DocumentMentionsRegex.PUNCTUATION
+const PUNC = DocumentMentionsRegex.PUNCTUATION;
 
-const TRIGGERS = ['@'].join('')
+const TRIGGERS = ['@'].join('');
 
 // Chars we expect to see in a mention (non-space, non-punctuation).
-const VALID_CHARS = `[^${TRIGGERS}${PUNC}\\s]`
+const VALID_CHARS = '[^' + TRIGGERS + PUNC + '\\s]';
 
 // Non-standard series of chars. Each series must be preceded and followed by
 // a valid char.
-const VALID_JOINS
-  = `(?:`
-  + `\\.[ |$]|` // E.g. "r. " in "Mr. Smith"
-  + ` |` // E.g. " " in "Josh Duck"
-  + `[${
-   PUNC
-   }]|` // E.g. "-' in "Salier-Hellendag"
-   + `)`
+const VALID_JOINS =
+  '(?:' +
+  '\\.[ |$]|' + // E.g. "r. " in "Mr. Smith"
+  ' |' + // E.g. " " in "Josh Duck"
+  '[' +
+  PUNC +
+  ']|' + // E.g. "-' in "Salier-Hellendag"
+  ')';
 
-const LENGTH_LIMIT = 75
+const LENGTH_LIMIT = 75;
 
 const AtSignMentionsRegex = new RegExp(
-  `(^|\\s|\\()(`
-  + `[${
-    TRIGGERS
-    }]`
-    + `((?:${
-    VALID_CHARS
-    }${VALID_JOINS
-    }){0,${
-    LENGTH_LIMIT
-    }})`
-    + `)$`,
-)
+  '(^|\\s|\\()(' +
+    '[' +
+    TRIGGERS +
+    ']' +
+    '((?:' +
+    VALID_CHARS +
+    VALID_JOINS +
+    '){0,' +
+    LENGTH_LIMIT +
+    '})' +
+    ')$',
+);
 
 // 50 is the longest alias length limit.
-const ALIAS_LENGTH_LIMIT = 50
+const ALIAS_LENGTH_LIMIT = 50;
 
 // Regex used to match alias.
 const AtSignMentionsRegexAliasRegex = new RegExp(
-  `(^|\\s|\\()(`
-  + `[${
-    TRIGGERS
-    }]`
-    + `((?:${
-    VALID_CHARS
-    }){0,${
-    ALIAS_LENGTH_LIMIT
-    }})`
-    + `)$`,
-)
+  '(^|\\s|\\()(' +
+    '[' +
+    TRIGGERS +
+    ']' +
+    '((?:' +
+    VALID_CHARS +
+    '){0,' +
+    ALIAS_LENGTH_LIMIT +
+    '})' +
+    ')$',
+);
 
 // At most, 5 suggestions are shown in the popup.
-const SUGGESTION_LIST_LENGTH_LIMIT = 5
+const SUGGESTION_LIST_LENGTH_LIMIT = 5;
 
-const mentionsCache = new Map()
+const mentionsCache = new Map();
 
 const dummyMentionsData = [
   'Aayla Secura',
@@ -476,7 +476,7 @@ const dummyMentionsData = [
   'Zev Senesca',
   'Ziro the Hutt',
   'Zuckuss',
-]
+];
 
 const dummyLookupService = {
   search(string: string, callback: (results: Array<string>) => void): void {

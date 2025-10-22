@@ -83,6 +83,7 @@
     "veaury": "^2.6.3",
     "vue": "catalog:",
     "vue-chartjs": "^5.3.2",
+    "prismjs": "catalog:",
     "y-websocket": "^3.0.0"
   },
   "devDependencies": {
@@ -92,6 +93,7 @@
     "@playwright/test": "^1.54.2",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^22.16.5",
+    "@types/prismjs": "catalog:",
     "@unocss/preset-attributify": "^66.4.1",
     "@unocss/preset-icons": "^66.4.1",
     "@unocss/preset-uno": "^66.4.1",

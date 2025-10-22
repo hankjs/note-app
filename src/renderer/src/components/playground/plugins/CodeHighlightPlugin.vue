@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
-import { registerCodeHighlighting } from '@lexical/code'
+import { registerCodeHighlighting } from '../nodes/CodeNode'
 import { useLexicalComposer } from 'lexical-vue'
 
 const editor = useLexicalComposer()

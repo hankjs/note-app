@@ -2,7 +2,7 @@ import type { Klass, LexicalNode } from 'lexical'
 import { HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table'
 import { ListItemNode, ListNode } from '@lexical/list'
-import { CodeHighlightNode, CodeNode } from '@lexical/code'
+// import { CodeHighlightNode, CodeNode } from '@lexical/code'
 import { AutoLinkNode, LinkNode } from '@lexical/link'
 import { HashtagNode } from '@lexical/hashtag'
 import { EmojiNode } from './EmojiNode'
@@ -20,6 +20,8 @@ import { CollapsibleContentNode } from '../plugins/CollapsiblePlugin/Collapsible
 import { CollapsibleContainerNode } from '../plugins/CollapsiblePlugin/CollapsibleContainerNode'
 import { CollapsibleTitleNode } from '../plugins/CollapsiblePlugin/CollapsibleTitleNode'
 import { StickyNode } from './StickyNode/StickyNode'
+import { HorizontalRuleNode } from 'lexical-vue'
+import { CodeNode, CodeHighlightNode } from '../nodes/CodeNode'
 
 const PlaygroundNodes: Array<Klass<LexicalNode>> = [
   HeadingNode,
@@ -50,6 +52,7 @@ const PlaygroundNodes: Array<Klass<LexicalNode>> = [
   CollapsibleContentNode,
   CollapsibleTitleNode,
   StickyNode,
+  HorizontalRuleNode,
 ]
 
 export default PlaygroundNodes

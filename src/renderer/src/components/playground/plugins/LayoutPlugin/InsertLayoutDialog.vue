@@ -3,6 +3,8 @@ import { computed, ref } from "vue"
 import { INSERT_LAYOUT_COMMAND } from "./LayoutPlugin.shared"
 import DropDown from "../../ui/DropDown.vue"
 import { LexicalEditor } from "lexical"
+import Button from "../../ui/Button.vue";
+import DropDownItem from "../../ui/DropDownItem.vue";
 
 const props = defineProps<{
   activeEditor: LexicalEditor

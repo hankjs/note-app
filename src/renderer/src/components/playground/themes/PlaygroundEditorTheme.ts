@@ -15,6 +15,7 @@ const theme: EditorThemeClasses = {
   blockCursor: 'PlaygroundEditorTheme__blockCursor',
   characterLimit: 'PlaygroundEditorTheme__characterLimit',
   code: 'PlaygroundEditorTheme__code',
+  codeLanguageLabel: 'PlaygroundEditorTheme__codeLanguageLabel',
   codeHighlight: {
     atrule: 'PlaygroundEditorTheme__tokenAttr',
     attr: 'PlaygroundEditorTheme__tokenAttr',

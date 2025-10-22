@@ -1,6 +1,7 @@
 import './components/playground/assets/style.css'
 import 'uno.css'
 
+import './utils/prism'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'

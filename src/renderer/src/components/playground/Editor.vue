@@ -38,6 +38,7 @@ import LayoutPlugin from "./plugins/LayoutPlugin/LayoutPlugin.vue"
 import EquationsPlugin from "./plugins/EquationsPlugin/EquationsPlugin.vue"
 import CollapsiblePlugin from "./plugins/CollapsiblePlugin/CollapsiblePlugin.vue"
 // import DateTimePlugin from "./plugins/DateTimePlugin/DateTimePlugin.vue"
+import '../../utils/prism'
 
 const editor = useLexicalComposer()
 const activeEditor = shallowRef<LexicalEditor>(editor)

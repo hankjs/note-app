@@ -176,6 +176,28 @@
   position: relative;
   tab-size: 2;
 }
+
+.PlaygroundEditorTheme__codeLanguageLabel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 8px;
+  color: #777;
+  text-align: right;
+  min-width: 25px;
+  user-select: none;
+  z-index: 1;
+  /* opacity: 0; */
+}
+
+.PlaygroundEditorTheme__codeLanguageLabel::before {
+  content: attr(data-language);
+}
+
+.PlaygroundEditorTheme__code:hover .PlaygroundEditorTheme__codeLanguageLabel {
+  opacity: 1;
+}
+
 .PlaygroundEditorTheme__code:before {
   content: attr(data-gutter);
   position: absolute;
