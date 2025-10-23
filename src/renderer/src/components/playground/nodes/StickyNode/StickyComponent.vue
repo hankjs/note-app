@@ -35,7 +35,7 @@ const emit = defineEmits<{
 
 const editor = useLexicalComposer()
 const stickyContainerRef = ref<null | HTMLDivElement>(null)
-const positioningRef = reactive<Positioning>({
+const positioningRef = ref<Positioning>({
   isDragging: false,
   offsetX: 0,
   offsetY: 0,
@@ -46,18 +46,17 @@ const positioningRef = reactive<Positioning>({
 const collaborationContext = useCollaborationContext()
 
 useEffect(() => {
-  const position = positioningRef
-  position.x = props.x
-  position.y = props.y
+  positioningRef.value.x = props.x
+  positioningRef.value.y = props.y
 
   const stickyContainer = stickyContainerRef.value
   if (stickyContainer !== null) {
-    positionSticky(stickyContainer, position)
+    positionSticky(stickyContainer, positioningRef.value)
   }
-}, [() => positioningRef.x, () => positioningRef.y])
+}, [() => props.x, () => props.y])
 
 useLayoutEffect(() => {
-  const position = positioningRef
+  const position = positioningRef.value
   const resizeObserver = new ResizeObserver((entries) => {
     for (let i = 0; i < entries.length; i++) {
       const entry = entries[i]
@@ -111,8 +110,9 @@ watch(
 )
 
 const handlePointerMove = (event: PointerEvent) => {
+  console.log("handlePointerMove", event)
   const stickyContainer = stickyContainerRef.value
-  const positioning = positioningRef
+  const positioning = positioningRef.value
   const rootElementRect = positioning.rootElementRect
   const zoom = calculateZoomLevel(stickyContainer)
   if (stickyContainer !== null && positioning.isDragging && rootElementRect !== null) {
@@ -124,14 +124,13 @@ const handlePointerMove = (event: PointerEvent) => {
 
 const handlePointerUp = (event: PointerEvent) => {
   const stickyContainer = stickyContainerRef.value
-  const positioning = positioningRef
   if (stickyContainer !== null) {
-    positioning.isDragging = false
+    positioningRef.value.isDragging = false
     stickyContainer.classList.remove("dragging")
     editor.update(() => {
       const node = $getNodeByKey(props.nodeKey)
       if (props.isStickyNode(node)) {
-        node.setPosition(positioning.x, positioning.y)
+        node.setPosition(positioningRef.value.x, positioningRef.value.y)
       }
     })
   }
@@ -149,7 +148,7 @@ const handlePointerDown = (event: PointerEvent) => {
     return
   }
   const stickContainer = stickyContainer
-  const positioning = positioningRef
+  const positioning = positioningRef.value
   if (stickContainer !== null) {
     const { top, left } = stickContainer.getBoundingClientRect()
     const zoom = calculateZoomLevel(stickContainer)
@@ -236,3 +235,5 @@ const { historyState } = useSharedHistoryContext()
     </div>
   </div>
 </template>
+
+<style src="./StickyNode.css"></style>

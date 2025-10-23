@@ -35,4 +35,6 @@ export function positionSticky(
   const rectTop = rootElementRect !== null ? rootElementRect.top : 0;
   style.top = rectTop + positioning.y + 'px';
   style.left = rectLeft + positioning.x + 'px';
+  console.log("style.top", style.top)
+  console.log("style.left", style.left)
 }
