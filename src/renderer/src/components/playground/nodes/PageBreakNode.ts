@@ -50,7 +50,7 @@ const PageBreakComponent = defineComponent({
       }
     }, [() => props.nodeKey, () => editor, () => isSelected.value])
 
-    return null
+    return () => null
   },
 })
 
